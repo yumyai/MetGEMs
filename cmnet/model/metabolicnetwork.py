@@ -14,6 +14,7 @@ class MetabolicNetwork(object):
     def __init__(self, name):
         self._name = name
         self._network = nx.DiGraph()
+        self._pathway = set()
         self._reaction = {}  # ReactionID -> Object
         self._matrix = []  # Matrix that could be used in COBRA
         self._gene = {}  # GeneID -> [List]
@@ -33,29 +34,24 @@ class MetabolicNetwork(object):
         """
         # Extract id from reaction object
         nodes = reaction.left + reaction.right
-        edge = reaction.ecnum  # Edge should be unique
+        edge = reaction.ecnum  # Edge should be unique.
 
         # Make an ID for enzyme and metabolites object,
         # Because the how metabolite/gene represent in reaction.dat seems to be not reliable.
         # Sometime they just use TYPE instead of name?
         # Assume that all metabolite's name is standardize.
 
-        # It is possible that one reaction can have multiple enzyme
+        # It is possible that one reaction can have multiple enzyme, but I hope not
         edge = tuple(edge)
         ",".join(sorted(edge))
-        # Check for metabolite that is common (WATER, Pi), and fan it out (WATER-001, WATER-002)
-
+        # TODO: Check for metabolite that is common (WATER, Pi), and put it out (WATER-001, WATER-002)
 
         # Put reaction ID into attribute so we can remember where it came from.
         # TODO: Put pathway ID into it to see overlap later
 
-        self._network.add_node()
-
-    def add_protein(self):
-        pass
-
-    def add_metabolite(self):
-        pass
+        # It seems like node with the same ID won't get duplicate, no need to check it.
+        self._network.add_nodes_from(nodes)
+        self._network.add_edge(key=reaction.id)
 
     def is_reaction_existed(self, reaction):
         """ Check if the reaction is already existed.
@@ -75,6 +71,14 @@ class MetabolicNetwork(object):
             pass
         pass
 
+    def add_pathway(self, pathway):
+
+        if pathway.id in self._pathway:
+            pass
+        # Check if there is a link with previous pathway.
+
+
+
 
     def _paranoid_check(self):
         # Just a check if something went wrong, maybe a typo in your metabolite?
@@ -88,52 +92,11 @@ class MetabolicNetwork(object):
         """
         pass
 
-class Pathway(object):
-    """ A subset of metabolic network.
-    """
 
-    def __init__(self, id_, name, network):
-        self._id = id_
-        self._name = name
-        self._reactions = {}
-        self._links = {}  # Since pathway is pretty small, adjacent list should be enough.
-
-    def add_reaction(self, reaction):
-        if reaction.name in self._reactions:
-            raise ValueError("Duplicate ID in reaction entries")
-
-        self._reactions[reaction.name] = reaction
-
-    def add_link(self, id1, id2):
-        """Add link between two reaction"""
-        pass
-
-    def __iter__(self):
-        for reaction in self._reactions:
-            yield reaction
-
-
-class Chem(NamedTuple):
+class Pathway(NamedTuple):
     id: str
-    name: str
-
-
-class Protein(NamedTuple):
-    id: str
-    name: str
-    ecnum: str
-    id_link: dict
-
-
-class Gene(NamedTuple):
-    id: str
-    prot: Protein
-
-
-class Taxa(NamedTuple):
-    id: str
-    name: str
-
+    inpathway: str
+    superpathway: str
 
 class Reaction(NamedTuple):
     id: str
@@ -145,6 +108,12 @@ class Reaction(NamedTuple):
     ecnum: str
     taxonomy: str
 
+class ReactionPrimary(NamedTuple):
+    # Only look at primary metabolite and simplified a bunch of thing.
+    id: str
+    left: str
+    right: str
+    ecnum: str
 
 class Mapper(object):
     """ For finding

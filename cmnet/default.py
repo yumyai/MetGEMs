@@ -1,6 +1,6 @@
 from cmnet.util import get_project_dir
 
-
+import os
 from os import path
 
 # Default support files packaged with PICRUSt2.
@@ -52,3 +52,5 @@ default_map =    {"METACYC": path.join(map_dir, "metacyc_pathways_info_prokaryot
                   "PFAM": path.join(map_dir, "pfam_info.tsv.gz"),
 
                   "TIGRFAM": path.join(map_dir, "tigrfam_info.tsv.gz")}
+
+# Pull this aside since they seems to be unused

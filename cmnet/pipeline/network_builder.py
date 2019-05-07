@@ -1,16 +1,65 @@
-# Pathway's IO module
-#
+# MetaCYC's IO module
+# Since the data is s-expression, it looks like a nested-parenthesis
 
-from enum import Enum
 from pathlib import Path
 from collections import defaultdict
+import re  # For parsing most parenthesis
+import itertools
 from typing import Generator
 
 import pandas as pd
+import pyparsing
 
-from cmnet.model.pathway import MetabolicNetwork, Pathway, Reaction
+from cmnet.model.metabolicnetwork import MetabolicNetwork, Pathway, Reaction
 from cmnet.utils import read_trait_table
 
+
+from pyparsing import Forward, nestedExpr, Word, alphanums
+
+# Test how to parse
+enclosed = Forward()
+nestedParens = nestedExpr('(', ')', content=enclosed)
+enclosed << (Word(alphanums+'.'+'-'+':') | ',' | nestedParens)
+
+def _parse_pathway_link(s):
+    """ Parse PATHWAY-LINKS from metacyc
+
+    :param s:
+    :return:
+    """
+    parsed = enclosed.parseString(s).asList()
+    direction = None  # not known
+    connect = []
+    primary_met = parsed[0]
+    # A newer schema I guess
+    if isinstance(parsed[1], list):  # (PATHWAY-LINKS - (CPD-7087 (PWY-5152 . :OUTGOING))
+        direction = parsed[1][2]
+        connect.append(parsed[1][0])
+        connect.extend(parsed[2:])  # (NICOTINAMIDE_RIBOSE (TRANS-RXN0-481 . :INCOMING) NAD-BIOSYNTHESIS-II PWY-5381)
+    else:
+        connect.extend(parsed[1:])
+
+    return (primary_met, direction, connect)
+
+def _parse_reaction_layout(s):
+    # Parsing reaction-layout
+    # (RXN-10132 (:LEFT-PRIMARIES QUER) (:DIRECTION :L2R) (:RIGHT-PRIMARIES CPD-10894))
+    # Into dictionary {"RXN-10132: [QUER,CPD-10894]"}
+    # I want it cheap and fast
+    # https://stackoverflow.com/questions/38999344/extract-string-within-parentheses-python
+    parsed = enclosed.parseString(s).asList()  # TODO: Use this
+    swap = False
+    reaction_name = s[0]
+    left = s[1].split(" ")[1]  # :LEFT-PRIMARIES
+    if s[2].contains(":R2L"):  # :DIRECTION
+        swap = True
+    right = s[3].split(" ")[1]  # :RIGHT-PRIMARIES
+    if swap:
+        temp=right
+        right=left
+        left=temp
+
+    return (reaction_name, left, right)
 
 def network_builder_workflow(trait_tab, reaction_dat:Path):
     """ Workflow for building a reaction network
@@ -66,7 +115,6 @@ def build_reactions_repo(reaction_dat):
 def build_network(reactions_list):
     for reaction in reactions_list:
         pass
-
 
 
 def read_cyc_dat(path:Path) -> Generator[dict, None, None]:
@@ -181,9 +229,94 @@ def record_to_reaction(record:dict):
 
     return reaction
 
+def _parse_super_pathway(record:dict):
+    pass
+
+
+def record_to_pathway(record:dict, reaction_ec):
+    """Parse pathway since we need to link everything together
+
+    :param record:
+    :param reaction_ec: Dictionary of reaction -> ec-number
+    :return:
+    """
+
+    mapping = {"UNIQUE-ID": "id",
+            "TYPES": None,
+            "COMMON-NAME": None,
+            "CITATIONS": None,
+            "CLASS-INSTANCE-LINKS": None,
+            "COMMENT": None,
+            "CREDITS": None,
+            "DBLINKS": None,
+            "ENZYME-USE": None,
+            "HYPOTHETICAL-REACTIONS": None,
+            "IN-PATHWAY": "inpathway",
+            "NET-REACTION-EQUATION": None,
+            "PATHWAY-INTERACTIONS": None,
+            "PATHWAY-LINKS": "pathway_link",
+            "POLYMERIZATION-LINKS": None,
+            "PREDECESSORS": None,
+            "PRIMARIES": None,
+            "REACTION-LAYOUT": "reaction_layout",
+            "REACTION-LIST": None,
+            "SPECIES": None,
+            "SUB-PATHWAYS": None,
+            "SUPER-PATHWAYS": "superpathway",
+            "SYNONYMS": None}
+
+    # We used list as a default, but most item should have one value.
+    #keep_as_list = ["IN-PATHWAY", "PRIMARIES", "REACTION-LIST", "REACTION-LAYOUT", "SPECIES"]
+    #for k in record.keys():
+    #    if k not in keep_as_list:
+    #        record[k] = record[k][0]
+
+    # SUPERPATHWAY doesn't have anything similar to it. sadly.
+    if record["TYPES"] ==  "Super-Pathways":
+        return _parse_super_pathway(record)
+
+    reaction_layout = {}
+    for line in record["REACTION-LAYOUT"]:
+        reaction_name, left, right = _parse_reaction_layout(line)
+        reaction_layout[reaction_name] = (left, right)
+    record[reaction_layout] = reaction_layout
+
+    # Predecessor tell how pathway hold itself, actually similar to reaction-layout
+    pathway_layout = defaultdict(list)
+    nodes = set()  # For later calculation
+    for line in record["PREDECESSOR"]:
+        s = line[1:-1]
+        t, f = s.split(" ")  # Make sure to swap them
+        nodes.add(f)
+        nodes.add(t)
+        pathway_layout[f].append(t)
+
+    # We use an explicit link to other pathway. Just in case.
+    # The end reaction is the one that does not point to any other reaction.
+    endreactions = nodes - set(pathway_layout.keys())
+    # The start reaction is the node that has no one pointing to
+    startreactions = nodes - itertools.chain(*pathway_layout.values())  # All nodes - all target
+    # Look at reaction_layout if it match something
+    for line in record["PATHWAY-LINKS"]:
+        prim_met, direction, connect_pth = _parse_pathway_link(line)
+
+    # Convert all old-key into our pattern.
+    for from_, to_ in mapping.items():
+        if to_ is not None:
+            if from_ in record:
+                record[to_] = record[from_]  # change name
+            else:
+                record[to_] = []  # Create an empty value
+        if from_ in record:  # Record doesn't contain every key. some record doesn't have COMMON-NAME
+            del(record[from_])  # Clean key that we don't use, also sometimes,
+
+    pathway = Pathway(**record)
+
+    return pathway
+
 
 def filter_reaction(reaction:Reaction):
-    """ Filter reaction to make sure that they could be in the same network
+    """ Filter reaction to the same species / locatoin
 
     Args:
         reaction:
@@ -202,38 +335,3 @@ def filter_reaction(reaction:Reaction):
         return False
 
     return True
-
-
-def readSBML(smblfile: Path) -> MetabolicNetwork:
-    """
-
-    Args:
-        smblfile: path to sbml file
-
-    Returns:
-
-    """
-
-#
-# Reaction parser
-#
-
-# def parse_cyc_enzreaction(s):
-#     """ Because the reaction is full of stupid things like
-#     1,2,4-trihydroxybenzene 1,2-dioxygenase hydroxyquinol + oxygen  <-->  2-maleylacetate + 2 H+
-#     amphetamine <i>N</i>-monooxygenase  amphetamine + NADPH + oxygen  <-->  N-(1-phenylpropan-2-yl)hydroxylamine + NADP+ + H2O
-#
-#
-#     Args:
-#         s: String in enzyme.col
-#
-#     Returns:
-#         left, right, reversible
-#
-#     """
-#     left, right = s.split("<-->")
-#     left = left.split(" + ") # Should be enough in most case
-#     right = right.split(" + ") # Should be enough in most case
-#     reversible = True
-#
-#     return [left, right, reversible]

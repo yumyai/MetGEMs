@@ -9,6 +9,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import biom
 
 def which(file):
     for path in os.environ["PATH"].split(os.pathsep):
@@ -131,17 +132,6 @@ def write_fasta(seqs, outfile):
             fh.write(">" + seqname + os.linesep)
             fh.write(seqs[seqname] + os.linesep)
 
-
-def biom_to_pandas_df(biom_tab):
-    '''Will convert from biom Table object to pandas dataframe.'''
-
-    # Note this is based on James Morton's blog post:
-    # http://mortonjt.blogspot.ca/2016/07/behind-scenes-with-biom-tables.html)
-
-    return(pd.DataFrame(np.array(biom_tab.matrix_data.todense()),
-                                 index=biom_tab.ids(axis='observation'),
-                                 columns=biom_tab.ids(axis='sample')))
-
 def get_project_dir():
     """ Returns the top-level project directory (when used with pip install -e
     """
@@ -162,3 +152,49 @@ def read_trait_table(file:Path):
 
     """
     return pd.read_csv(file, index_col="assembly", dtype={'sequence' : str})
+
+
+def biom_to_pandas_df(biom_tab):
+    '''Will convert from biom Table object to pandas dataframe.'''
+
+    # Note this is based on James Morton's blog post:
+    # http://mortonjt.blogspot.ca/2016/07/behind-scenes-with-biom-tables.html)
+    return(pd.DataFrame(np.array(biom_tab.matrix_data.todense()),
+                                 index=biom_tab.ids(axis='observation'),
+                                 columns=biom_tab.ids(axis='sample')))
+
+
+def read_seqabun(infile):
+    '''Will read in sequence abundance table in either TSV, BIOM, or mothur
+    shared format.'''
+
+    # First check extension of input file. If extension is "biom" then read in
+    # as BIOM table and return. This is expected to be the most common input.
+    in_name, in_ext = os.splitext(infile)
+    if in_ext == "biom":
+        return(biom_to_pandas_df(biom.load_table(infile)))
+
+    # Next check if input file is a mothur shared file or not by read in first
+    # row only.
+    mothur_format = False
+    try:
+        in_test = pd.read_table(filepath_or_buffer=infile, sep="\t", nrows=1)
+        in_test_col = list(in_test.columns.values)
+        if len(in_test_col) >= 4 and (in_test_col[0] == "label" and \
+                                      in_test_col[1] == "Group" and \
+                                      in_test_col[2] == "numOtus"):
+            mothur_format = True
+    except Exception:
+        pass
+
+    # If identified to be mothur format then remove extra columns, set "Group"
+    # to be index (i.e. row) names and then transpose.
+    if mothur_format:
+        input_seqabun = pd.read_table(filepath_or_buffer=infile, sep="\t")
+        input_seqabun.drop(labels=["label", "numOtus"], axis=1, inplace=True)
+        input_seqabun.set_index(keys="Group", drop=True, inplace=True,
+                                verify_integrity=True)
+        input_seqabun.index.name = None
+        return(input_seqabun.transpose())
+    else:
+        return(biom_to_pandas_df(biom.load_table(infile)))
