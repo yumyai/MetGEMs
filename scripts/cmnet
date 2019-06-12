@@ -3,9 +3,13 @@
 import argparse
 import sys
 
+tasks = {
+    'markerplace': 'Place marker',
+    'metpred': 'Predict'
+}
 
 def buildcmNetwork(cmdArgs):
-    """Create community network from HMP output.
+    """ Create community metabolic network from HMP.
 
     Args:
         cmdArgs (dictionary): args["folder", "output"]
@@ -13,61 +17,57 @@ def buildcmNetwork(cmdArgs):
     Returns: TODO
 
     """
-    import argparse
+    parser = argparse.ArgumentParser(
+              description="",
+              usage="")
 
-    buildcmParser = argparse.ArgumentParser()
-    buildcmParser.add_argument("")
-    buildcmParser.add_argument("-k", type=int, help='k-mer size to use', default=4)
-    buildcmParser.add_argument("-o", "--output", required=True)
+    parser.add_argument("-k", type=int, help='k-mer size to use', default=4)
+    parser.add_argument("-o", "--output", required=True)
 
-    args = buildcmParser.parse_args(cmdArgs)
+    args = parser.parse_args(cmdArgs)
 
     print("Success")
 
-def markerPlacement(cmdArgs):
-    """Create community network from HMP output.
+def metabolic_prediction():
+    parser = argparse.ArgumentParser(
+              description="Map normalize classified reads table to table",
+              usage="cmnet metpred ")
 
-    Args:
-        cmdArgs (dictionary): args["folder", "output"]
+    parser.add_argument("-i", type=str)
+
+
+
+def markerplacement():
+    """ Place genus to the closest one.
 
     Returns: TODO
 
     """
-    import argparse
+    parser = argparse.ArgumentParser(
+              description="",
+              usage=""
+            )
 
-    buildcmParser = argparse.ArgumentParser()
-    buildcmParser.add_argument("")
-    buildcmParser.add_argument("-k", type=int, help='k-mer size to use', default=4)
-    buildcmParser.add_argument("-o", "--output", required=True)
-
-    args = buildcmParser.parse_args(cmdArgs)
-
-    print("Success")
-
+def print_help_and_exit():
+    print('')
+    sys.exit(0)
 
 def main():
-    """ Main entry for program.
+    """ Main entry for commandline
     """
-    commands = {"buildNetwork": buildcmNetwork,
-                "markerPlacement": markerPlacement}
 
     usage_s = """cmnet <command> [args]"""
-    commandParser = argparse.ArgumentParser(prog="CMNet", description="", usage=usage_s)
-    commandParser.add_argument('command')
-    args = commandParser.parse_args(sys.argv[1:2])
+    task = sys.argv.pop(1)
 
-    if args.command not in commands:
-        commandParser.print_help()
-        exit(1)
+    if task not in tasks:
+        print_help_and_exit()
 
-    command = args.command
-    commands[command](sys.argv[2:])
-
+    tasks[task]()  # Run task
     return 0
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         exit(1)
-    retCode = main() # Argument is global anyway...
+    retCode = main()
     exit(retCode)

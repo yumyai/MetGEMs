@@ -3,7 +3,8 @@ from cmnet.util import get_project_dir
 import os
 from os import path
 
-# Default support files packaged with PICRUSt2.
+# Default support files packaged with CMNET
+## For genus assignment
 project_dir = get_project_dir()
 
 default_fasta = path.join(project_dir, "default_files", "prokaryotic",
@@ -23,8 +24,11 @@ default_pathway_map = path.join(project_dir, "default_files",
                                 "pathway_mapfiles",
                                 "metacyc_path2rxn_struc_filt_pro.txt")
 
-# Inititalize default trait table files for hsp.py.
-prokaryotic_dir = path.join(project_dir, "default_files", "prokaryotic")
+## For state prediction
+genus_dir = path.join(project_dir, "default_files", "prokaryotic")
+
+genus_tables {"reaction": path.join(genus_dir, "reaction.tsv.gz")
+              "ko":       path.join(genus_dir, "ko.tsv.gz")}
 
 default_tables = {"16S": path.join(prokaryotic_dir, "16S.txt.gz"),
 
