@@ -4,37 +4,10 @@ import argparse
 import sys
 
 tasks = {
-    'markerplace': 'Place marker',
-    'metpred': 'Predict'
+    'markp': "Place marker to the closest model",
+    'metp': "Predict metabolic from place marker",
+    'mbuild': "Build metabolic network"
 }
-
-def buildcmNetwork(cmdArgs):
-    """ Create community metabolic network from HMP.
-
-    Args:
-        cmdArgs (dictionary): args["folder", "output"]
-
-    Returns: TODO
-
-    """
-    parser = argparse.ArgumentParser(
-              description="",
-              usage="")
-
-    parser.add_argument("-k", type=int, help='k-mer size to use', default=4)
-    parser.add_argument("-o", "--output", required=True)
-
-    args = parser.parse_args(cmdArgs)
-
-    print("Success")
-
-def metabolic_prediction():
-    parser = argparse.ArgumentParser(
-              description="Map normalize classified reads table to table",
-              usage="cmnet metpred ")
-
-    parser.add_argument("-i", type=str)
-
 
 
 def markerplacement():
@@ -62,7 +35,9 @@ def main():
     if task not in tasks:
         print_help_and_exit()
 
-    tasks[task]()  # Run task
+    import importlib
+    taskmodule = importlib.import_module("cmnet.tasks.{}".format(task))
+    taskmodule.run()
     return 0
 
 

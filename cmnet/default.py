@@ -27,8 +27,8 @@ default_pathway_map = path.join(project_dir, "default_files",
 ## For state prediction
 genus_dir = path.join(project_dir, "default_files", "prokaryotic")
 
-genus_tables {"reaction": path.join(genus_dir, "reaction.tsv.gz")
-              "ko":       path.join(genus_dir, "ko.tsv.gz")}
+genus_tables = {"reaction": path.join(genus_dir, "reaction.tsv.gz"),
+                "ko":       path.join(genus_dir, "ko.tsv.gz")}
 
 default_tables = {"16S": path.join(prokaryotic_dir, "16S.txt.gz"),
 

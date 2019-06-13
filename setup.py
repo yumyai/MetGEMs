@@ -3,9 +3,9 @@
 from setuptools import setup
 from glob import glob
 
-__copyright__ = "Copyright 2018, The CMNet Project"
+__copyright__ = "Copyright 2019, The CMNet Project"
 __license__ = "Apache License2"
-__version__ = "0.0.0"
+__version__ = "0.0.0a"
 __maintainer__ = "Preecha Patumcharoenpol"
 
 long_description = ("Community Metabolic Network builder is the"
@@ -19,9 +19,9 @@ setup(name='cmnet',
       url='https://github.com/yumyai/CMNet',
       packages=['cmnet'],
       scripts=glob('scripts/*'),
-      package_data={'picrust2':
+      package_data={'cmnet':
                     ['ext-tools/*R']},
       install_requires=['numpy',
-                        'joblib',
-                        'biom-format'],
+                        'pandas',
+                        'joblib'],
 long_description=long_description)
