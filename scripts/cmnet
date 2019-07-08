@@ -29,11 +29,11 @@ def print_help_and_exit():
         print("{} - {}".format(task, tasks[task]))
     sys.exit(0)
 
+
 def main():
     """ Main entry for commandline
     """
 
-    usage_s = """cmnet <command> [args]"""
     task = sys.argv.pop(1)
 
     if task not in tasks:

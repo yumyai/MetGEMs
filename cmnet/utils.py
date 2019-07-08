@@ -9,7 +9,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import biom
 
 def which(file):
     for path in os.environ["PATH"].split(os.pathsep):
@@ -44,93 +43,82 @@ def make_output_dir(dirpath, strict=False):
     return dirpath
 
 
-def read_stockholm(filename, clean_char=True):
-    '''Reads in Stockholm formatted multiple sequence alignment and returns
-    dictionary with ids as keys and full concatenated sequences as values. When
-    clean_char=True this function will convert all characters to uppercase and
-    convert "." characters to "-". This was originally written for converting
-    hmmalign output files.'''
+def read_otutable(fh):
+    df = pd.read_csv(fh, sep="\t", header=0, index_col=0)
+    return df
 
-    # Intitialize defaultdict that will contain strings.
-    seqs = defaultdict(str)
+def read_taxatable(fh):
+    # Currently, just parse only greengenes
+    alignment = ["kingdom", "phylum", "class", "order", "family", "genus", "species"]  
+    predf = pd.read_csv(fh, sep="\t", header=0)
+    taxondf = pd.DataFrame.from_records(predf.Taxon.apply(gg_parse)).reindex(columns=alignment)
+    df = pd.concat([predf["Feature ID"], taxondf, predf["Confidence"]], axis=1)
+    df = df.set_index("Feature ID")
+    return df
 
-    line_count = 0
+def read_reaction_files(fh):
+    # 
+    pass
 
-    # Read in file line-by-line.
-    with open(filename, "r") as stockholm:
+def gg_parse(s):
+    """ Parse taxonomy string in GG format. Return 7 levels of taxonomy.
+       Args:
+          s: taxonomy string in gg format (k__Kingdom; p__Phylum)
+    """
+    
+    # TODO: Make it all lowercase
+    abbr_dct = {"k": "kingdom", "p": "phylum", "c": "class", "o": "order",
+                "f": "family", "g": "genus", "s": "species"}
+    taxa_dct = {"kingdom": "", "phylum": "", "class": "", "order": "",
+                "family": "", "genus": "", "species": ""}  # Because groupby exclude None value.
+    items = s.split("; ")
+   
+    # Sanity check
+    if not s.startswith("k__"):
+        # Unidentified OTU
+        return taxa_dct
+    
+    if len(items) != 7:
+        raise TaxaStringError()
+        
+    for token in items:
+        abbrv, taxa = token.split("__")
+        taxa_lvl = abbr_dct[abbrv]
+        taxa = taxa if taxa else ""  # If empty, leave it as empty string
+        # If it is bracket, then remove it
+        if len(taxa) > 0 and taxa[0] == "[" and taxa[-1] == "]":
+            taxa = taxa[1:-1]
+        
+        taxa_dct[taxa_lvl] = taxa
+        
+    # Create species name since GG omit genus part
+    if taxa_dct["genus"] != "" and taxa_dct["species"] != "":
+        taxa_dct["species"] = taxa_dct["genus"] + "_" + taxa_dct["species"]
+    
+    return taxa_dct
 
-        for line in stockholm:
 
-            line = line.rstrip()
+def rdp_parse(s):
+    """ Parse RDP taxonomy string with 7 level format (SILVA uses it.)
+        D_0__Bacteria;D_1__Epsilonbacteraeota;D_2__Campylobacteria;D_3__Campylobacterales;D_4__Thiovulaceae;D_5__Sulfuricurvum;D_6__Sulfuricurvum sp. EW1
+        The ambiguous_taxa will be convert to empty string.
+    """
+    abbr_dct = {"D_0": "kingdom", "D_1": "phylum", "D_2": "class", "D_3": "order",
+                "D_4": "family", "D_5": "genus", "D_6": "species"}
+    taxa_dct = {"kingdom": "", "phylum": "", "class": "", "order": "",
+                "family": "", "genus": "", "species": ""}
+    tokens = s.split(";")
+    for token in tokens: # D_0__Bacteria, or Ambiguous_taxa
+        if token == "Ambiguous_taxa":
+            break
+        taxLv, taxName = token.split("__")
+        # Make the output behave like GG parse
+        taxLv = abbr_dct[taxLv]
+        taxa_dct[taxLv] = taxName
+        
+    return taxa_dct
 
-            # Header-line - check that it starts with "# STOCKHOLM".
-            if line_count == 0 and "# STOCKHOLM" not in line:
-                sys.exit("Error - stockholm format multiple-sequence "
-                         "alignments should have \"# STOCKHOLM\" (and the "
-                         "version number) on the first line")
 
-            line_count += 1
-
-            # Skip blank lines, lines that start with comment, and lines that
-            # start with "//".
-            if not line or line[0] == "#" or line[0:2] == "//":
-                continue
-
-            line_split = line.split()
-
-            if clean_char:
-                line_split[1] = line_split[1].upper()
-                line_split[1] = line_split[1].replace(".", "-")
-
-            # Add sequence to dictionary.
-            seqs[line_split[0]] += line_split[1]
-
-    # Double-check that last line was "//"
-    if line[0:2] != "//":
-        raise ValueError('Error - last line of stockholm file should have been \"//\".')
-    return seqs
-
-def read_fasta(infile, cut_header=False):
-
-    '''Read in FASTA file and return dictionary with each independent sequence
-    id as a key and the corresponding sequence string as the value.
-    '''
-
-    seq = {}
-    name = None
-
-    # Read in FASTA line-by-line.
-    with open(infile, "r") as fasta:
-
-        for line in fasta:
-            line = line.strip()
-
-            # If header-line then split by whitespace, take the first element,
-            # and define the sequence name as everything after the ">".
-            if line[0] == ">":
-
-                line = line[1:]  # remove >
-
-                if cut_header:
-                    name = line.split()[0]
-                else:
-                    name = line
-
-                # Intitialize empty sequence with this id.
-                seq[name] = ""
-
-            else:
-                # Add sequence to dictionary.
-                seq[name] += line
-
-    return seq
-
-def write_fasta(seqs, outfile):
-
-    with open(outfile, "w") as fh:
-        for seqname in seqs:
-            fh.write(">" + seqname + os.linesep)
-            fh.write(seqs[seqname] + os.linesep)
 
 def get_project_dir():
     """ Returns the top-level project directory (when used with pip install -e
