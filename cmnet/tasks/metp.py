@@ -1,3 +1,5 @@
+""" Document
+"""
 
 import cmnet.default
 

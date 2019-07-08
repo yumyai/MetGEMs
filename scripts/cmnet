@@ -4,7 +4,7 @@ import argparse
 import sys
 
 tasks = {
-    'markp': "Place marker to the closest model",
+    'markp': "Place marker to the metabolic model",
     'metp': "Predict metabolic from place marker",
     'mbuild': "Build metabolic network"
 }
@@ -22,7 +22,11 @@ def markerplacement():
             )
 
 def print_help_and_exit():
-    print('')
+    print('CMNet - Community Metabolic Network predictor from')
+    print('\nUsage: cmnet <command> [options] <arguments>')
+    print('\nAvailable command')
+    for task in tasks.keys():
+        print("{} - {}".format(task, tasks[task]))
     sys.exit(0)
 
 def main():
@@ -43,6 +47,6 @@ def main():
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        exit(1)
+        print_help_and_exit()
     retCode = main()
     exit(retCode)
