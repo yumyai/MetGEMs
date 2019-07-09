@@ -5,8 +5,8 @@ from cmnet import utils
 
 class TestIOFormat():
 
-    otutab_f = "test_data/utils/minimum_otu.tsv"
-    taxtab_f = "test_data/utils/minimum_tax.tsv"
+    otutab_f = "tests/test_data/utils/minimum_otu.tsv"
+    taxtab_f = "tests/test_data/utils/minimum_tax.tsv"
     otutab = utils.read_otutable(otutab_f)
     taxtab = utils.read_taxatable(taxtab_f)
 

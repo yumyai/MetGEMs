@@ -1,48 +1,37 @@
-from cmnet.util import get_project_dir
-
+# List of default files for mapping
 import os
 from os import path
+from cmnet.utils import get_project_dir
 
 # Default support files packaged with CMNET
-## For genus assignment
-project_dir = get_project_dir()
+#   For genus assignment
+_project_dir = get_project_dir()
 
-## For state prediction
-species_dir = path.join(project_dir, "default_files", "species_level")
-genus_dir = path.join(project_dir, "default_files", "genus_level")
+#   For state prediction
+species_dir = path.join(_project_dir, "default_files", "species_level")
+genus_dir = path.join(_project_dir, "default_files", "genus_level")
 
 genus_tables = {"reaction": path.join(genus_dir, "agora.reaction.gmean.tsv"),
-                "ko":       path.join(genus_dir, "ko.tsv.gz")}
+                "KO":       path.join(genus_dir, "ko.tsv.gz")}
 
 species_tables = {"reaction": path.join(genus_dir, "agora.reaction.smean.tsv"),
-                "ko":       path.join(genus_dir, "ko.tsv.gz")}
+                  "KO":       path.join(genus_dir, "ko.tsv.gz")}
 
 
-default_tables = {"16S": path.join(prokaryotic_dir, "16S.txt.gz"),
+# Initialize reaction mapfiles to be used with AGORA model
+map_dir = path.join(_project_dir, "default_files", "map_files")
 
-                  "COG": path.join(prokaryotic_dir, "cog.txt.gz"),
+default_map = {"KO": "reaction_ko.tsv",
+               "EC": "reaction_ec.tsv"}
 
-                  "EC": path.join(prokaryotic_dir, "ec.txt.gz"),
-
-                  "KO": path.join(prokaryotic_dir, "ko.txt.gz"),
-
-                  "PFAM": path.join(prokaryotic_dir, "pfam.txt.gz"),
-
-                  "TIGRFAM": path.join(prokaryotic_dir, "tigrfam.txt.gz")}
-
-# Initialize default mapfiles to be used with AGORA model
-map_dir = path.join(project_dir, "default_files", "map_files")
-
-default_map =    {"METACYC": path.join(map_dir, "metacyc_pathways_info_prokaryotes.txt.gz"),
-
-                  "COG": path.join(map_dir, "cog_info.tsv.gz"),
-
-                  "EC": path.join(map_dir, "ec_level4_info.tsv.gz"),
-
-                  "KO": path.join(map_dir, "ko_info.tsv.gz"),
-
-                  "PFAM": path.join(map_dir, "pfam_info.tsv.gz"),
-
-                  "TIGRFAM": path.join(map_dir, "tigrfam_info.tsv.gz")}
-
-# Pull this aside since they seems to be unused
+#default_tables = {"16S": path.join(prokaryotic_dir, "16S.txt.gz"),
+#
+#                  "COG": path.join(prokaryotic_dir, "cog.txt.gz"),
+#
+#                  "EC": path.join(prokaryotic_dir, "ec.txt.gz"),
+#
+#                  "KO": path.join(prokaryotic_dir, "ko.txt.gz"),
+#
+#                  "PFAM": path.join(prokaryotic_dir, "pfam.txt.gz"),
+#
+#                  "TIGRFAM": path.join(prokaryotic_dir, "tigrfam.txt.gz")}
