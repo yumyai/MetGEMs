@@ -5,6 +5,7 @@ import argparse
 import cmnet.default
 from cmnet.utils import read_otutable, read_taxatable
 import pandas as pd
+from pandas import DataFrame
 import numpy as np
 
 def run():
@@ -28,14 +29,12 @@ def run():
 
 
 
-
 def model_placement(otutab, otu_mapping) -> DataFrame:
     """ Mapping OTU into model. Currently just use linage name from otu_mapping
-    
+
         Args:
           otutab (DataFrame): otu table (row as sample)
           otu_mapping (Series): Index as otu and value as group
-      
     """
     grouping = otu_mapping.name
     otutab_with_model = (otutab.join(otu_mapping, how="left"))

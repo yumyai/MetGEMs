@@ -7,28 +7,16 @@ from os import path
 ## For genus assignment
 project_dir = get_project_dir()
 
-default_fasta = path.join(project_dir, "default_files", "prokaryotic",
-                          "reference.fna")
-
-default_tree = path.join(project_dir, "default_files", "prokaryotic",
-                         "reference.tre")
-
-default_hmm = path.join(project_dir, "default_files", "prokaryotic",
-                        "reference.hmm")
-
-default_regroup_map = path.join(project_dir, "default_files",
-                                "pathway_mapfiles",
-                                "ec_level4_to_metacyc_rxn.tsv")
-
-default_pathway_map = path.join(project_dir, "default_files",
-                                "pathway_mapfiles",
-                                "metacyc_path2rxn_struc_filt_pro.txt")
-
 ## For state prediction
-genus_dir = path.join(project_dir, "default_files", "prokaryotic")
+species_dir = path.join(project_dir, "default_files", "species_level")
+genus_dir = path.join(project_dir, "default_files", "genus_level")
 
-genus_tables = {"reaction": path.join(genus_dir, "reaction.tsv.gz"),
+genus_tables = {"reaction": path.join(genus_dir, "agora.reaction.gmean.tsv"),
                 "ko":       path.join(genus_dir, "ko.tsv.gz")}
+
+species_tables = {"reaction": path.join(genus_dir, "agora.reaction.smean.tsv"),
+                "ko":       path.join(genus_dir, "ko.tsv.gz")}
+
 
 default_tables = {"16S": path.join(prokaryotic_dir, "16S.txt.gz"),
 
@@ -42,8 +30,8 @@ default_tables = {"16S": path.join(prokaryotic_dir, "16S.txt.gz"),
 
                   "TIGRFAM": path.join(prokaryotic_dir, "tigrfam.txt.gz")}
 
-# Initialize default mapfiles to be used with add_descriptions.py
-map_dir = path.join(project_dir, "default_files", "description_mapfiles")
+# Initialize default mapfiles to be used with AGORA model
+map_dir = path.join(project_dir, "default_files", "map_files")
 
 default_map =    {"METACYC": path.join(map_dir, "metacyc_pathways_info_prokaryotes.txt.gz"),
 
