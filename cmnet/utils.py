@@ -47,6 +47,8 @@ def read_otutable(fh):
     df = pd.read_csv(fh, sep="\t", header=0, index_col=0)
     return df
 
+
+
 def read_taxatable(fh):
     # Currently, just parse only greengenes
     alignment = ["kingdom", "phylum", "class", "order", "family", "genus", "species"]  
@@ -58,6 +60,9 @@ def read_taxatable(fh):
 
 def read_reaction_files(fh):
     # 
+    pass
+
+class TaxaStringError(ValueError):
     pass
 
 def gg_parse(s):
@@ -78,7 +83,7 @@ def gg_parse(s):
         # Unidentified OTU
         return taxa_dct
     
-    if len(items) != 7:
+    if len(items) > 7:
         raise TaxaStringError()
         
     for token in items:

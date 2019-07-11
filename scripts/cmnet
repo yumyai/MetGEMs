@@ -10,17 +10,6 @@ tasks = {
 }
 
 
-def markerplacement():
-    """ Place genus to the closest one.
-
-    Returns: TODO
-
-    """
-    parser = argparse.ArgumentParser(
-              description="",
-              usage=""
-            )
-
 def print_help_and_exit():
     print('CMNet - Community Metabolic Network predictor from')
     print('\nUsage: cmnet <command> [options] <arguments>')

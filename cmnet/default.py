@@ -8,17 +8,18 @@ from cmnet.utils import get_project_dir
 _project_dir = get_project_dir()
 
 #   For state prediction
-species_dir = path.join(_project_dir, "default_files", "species_level")
 genus_dir = path.join(_project_dir, "default_files", "genus_level")
 
-genus_tables = {"reaction": path.join(genus_dir, "agora.reaction.gmean.tsv"),
+genus_tables = {"model_reaction": path.join(genus_dir, "agora.reaction.gmean.tsv"),
                 "KO":       path.join(genus_dir, "ko.tsv.gz")}
 
-species_tables = {"reaction": path.join(genus_dir, "agora.reaction.smean.tsv"),
-                  "KO":       path.join(genus_dir, "ko.tsv.gz")}
+species_dir = path.join(_project_dir, "default_files", "species_level")
+
+species_tables = {"model_reaction": path.join(genus_dir, "agora.reaction.smean.tsv"),
+                  "KO":       path.join(species_dir, "ko.tsv.gz")}
 
 
-# Initialize reaction mapfiles to be used with AGORA model
+# Initialize reaction mapfiles for converting AGORA reaction into other type
 map_dir = path.join(_project_dir, "default_files", "map_files")
 
 default_map = {"KO": "reaction_ko.tsv",

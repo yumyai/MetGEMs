@@ -11,14 +11,14 @@ import numpy as np
 def run():
     parser = argparse.ArgumentParser(
             description="Calculate model's abundance from marker data",
-            usage="cmnet markp -i input.fasta -t taxa.tsv")
+            usage="cmnet markp -i input.fasta -t taxa.tsv -m [genus/species] -o output.tsv")
 
     parser.add_argument("-i", "--otutab", type=argparse.FileType("r"),
                         required=True, help='OTU table')
     parser.add_argument("-t", "--taxtsv", type=argparse.FileType("r"), required=True,
                         help='Linage files')
-    parser.add_argument("-m", "--model", type=argparse.FileType("r"), required=True,
-                        help='Linage files')
+    parser.add_argument("-m", "--model", type=str, required=True, default="genus",
+                        help='Linage to used,')
     parser.add_argument("-o", "--output", type=argparse.FileType("w"), required=True,
                         help='Output table')
     args = parser.parse_args()
@@ -26,22 +26,47 @@ def run():
     # Load table
     otutab = read_otutable(args.otutab)
     taxtab = read_taxatable(args.taxtsv)
+    # Calculate number of model.
+    level = args.model
 
+    modeltab = model_placement(otutab, taxtab[level])
+    modeltab.to_csv(args.output, sep="\t")
+
+
+def _align_dataframe(main, converter):
+    """ Align index / column for frictionless calculation
+    The most use case is to align B/A for convert A/Sample into B/Sample.
+    While pandas help in sorting index, it error when index does not exists.
+
+    """
+    # Make sure that they are at least compatible, at least 1 intersection
+    MAINIDX = set(main.index).intersection(converter.column)
+    assert len(MAINIDX) / len(main.index) > 0
+
+    main = main.reindex(index=MAINIDX)
+    converter = converter.reindex(columns=MAINIDX)
+
+    return (main, converter)
 
 
 def model_placement(otutab, otu_mapping) -> DataFrame:
-    """ Mapping OTU into model. Currently just use linage name from otu_mapping
+    """ Mapping OTU into model. Uses linage name from simple mapping.
 
         Args:
           otutab (DataFrame): otu table (row as sample)
-          otu_mapping (Series): Index as otu and value as group
+          otu_mapping (Series): Index as otu and value as mapping values
     """
     grouping = otu_mapping.name
     otutab_with_model = (otutab.join(otu_mapping, how="left"))
     model_tab = (otutab_with_model
                        .groupby(grouping)
                        .aggregate(sum))
+
+    model_tab.index.name = "model"
     return model_tab
+
+def model_function():
+    pass
 
 def _calculate_level(otutab, taxtab, level):
     """ Currently support genus and species
@@ -55,5 +80,4 @@ def _calculate_level(otutab, taxtab, level):
 def _calculate_stepwise(otutab, taxtab):
     _step = ["species", "genus", "family"]
     # Map as much as possible in species level
-
-
+    pass

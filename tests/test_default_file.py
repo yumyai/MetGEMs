@@ -7,7 +7,7 @@ from cmnet.default import genus_tables, species_tables
 class TestAttachFiles():
 
     def test_check_file(self):
-        os.path.exists(genus_tables["reaction"])
+        os.path.exists(genus_tables["model_reaction"])
         os.path.exists(genus_tables["KO"])
-        os.path.exists(species_tables["reaction"])
+        os.path.exists(species_tables["model_reaction"])
         os.path.exists(species_tables["KO"])
