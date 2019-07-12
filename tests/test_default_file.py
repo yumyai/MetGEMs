@@ -8,6 +8,6 @@ class TestAttachFiles():
 
     def test_check_file(self):
         os.path.exists(genus_tables["model_reaction"])
-        os.path.exists(genus_tables["KO"])
+        os.path.exists(genus_tables["16s"])
         os.path.exists(species_tables["model_reaction"])
-        os.path.exists(species_tables["KO"])
+        os.path.exists(species_tables["16s"])

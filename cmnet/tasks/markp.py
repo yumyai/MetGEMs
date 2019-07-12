@@ -26,11 +26,35 @@ def run():
     # Load table
     otutab = read_otutable(args.otutab)
     taxtab = read_taxatable(args.taxtsv)
+    # Load default files according to the argument
     # Calculate number of model.
     level = args.model
-
+    defaulttab = None
+    if level == "genus":
+        defaulttab = cmnet.default.genus_tables
+    elif level == "species":
+        defaulttab =  cmnet.default.species_tables
+    
     modeltab = model_placement(otutab, taxtab[level])
     modeltab.to_csv(args.output, sep="\t")
+    # Normalize 16s
+
+
+def model2function(modeltab, function_tab):
+    """ 
+    """
+    pass
+
+def normalize_16s(modeltab, rrnaN):
+    """
+    Args:
+      modeltab (DataFrame):
+      rrnaN (Series):
+    """
+    divarr = rrnaN.reindex(modeltab.index, fill_value=1).values
+    normmodeltab = modeltab.divide(divarr, axis=0)
+    return normmodeltab
+
 
 
 def _align_dataframe(main, converter):

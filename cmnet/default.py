@@ -11,13 +11,12 @@ _project_dir = get_project_dir()
 genus_dir = path.join(_project_dir, "default_files", "genus_level")
 
 genus_tables = {"model_reaction": path.join(genus_dir, "agora.reaction.gmean.tsv"),
-                "KO":       path.join(genus_dir, "ko.tsv.gz")}
+        "16s":  path.join(genus_dir, "16s.tsv")}
 
 species_dir = path.join(_project_dir, "default_files", "species_level")
 
 species_tables = {"model_reaction": path.join(genus_dir, "agora.reaction.smean.tsv"),
-                  "KO":       path.join(species_dir, "ko.tsv.gz")}
-
+                  "16s":       path.join(species_dir, "16s.tsv")}
 
 # Initialize reaction mapfiles for converting AGORA reaction into other type
 map_dir = path.join(_project_dir, "default_files", "map_files")
