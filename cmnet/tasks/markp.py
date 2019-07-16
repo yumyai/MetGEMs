@@ -29,24 +29,28 @@ def run():
     # Load default files according to the argument
     # Calculate number of model.
     level = args.model
-    defaulttab = None
+    modelcon = None
     if level == "genus":
-        defaulttab = cmnet.default.genus_tables
+        modelcon = cmnet.default.genus_tables
     elif level == "species":
-        defaulttab =  cmnet.default.species_tables
+        modelcon = cmnet.default.species_tables
+
+    # Initialize all
+    rRNANorm = modelcon["16s"]
     
     modeltab = model_placement(otutab, taxtab[level])
     modeltab.to_csv(args.output, sep="\t")
     # Normalize 16s
+    normmodeltab = modeltab
 
 
 def model2function(modeltab, function_tab):
-    """ 
+    """ Extrapolate model to the function with known
     """
     pass
 
 def normalize_16s(modeltab, rrnaN):
-    """
+    """ normalize number of organism with 16s
     Args:
       modeltab (DataFrame):
       rrnaN (Series):
@@ -54,7 +58,6 @@ def normalize_16s(modeltab, rrnaN):
     divarr = rrnaN.reindex(modeltab.index, fill_value=1).values
     normmodeltab = modeltab.divide(divarr, axis=0)
     return normmodeltab
-
 
 
 def _align_dataframe(main, converter):
@@ -89,7 +92,9 @@ def model_placement(otutab, otu_mapping) -> DataFrame:
     model_tab.index.name = "model"
     return model_tab
 
-def model_function():
+def model2function(modeltab, m2f_matrix):
+    """ Convert model count into function
+    """
     pass
 
 def _calculate_level(otutab, taxtab, level):

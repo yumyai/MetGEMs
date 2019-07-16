@@ -3,6 +3,7 @@
 import pandas as pd
 from cmnet.tasks.markp import model_placement as mp
 from cmnet.tasks.markp import normalize_16s as ns
+from cmnet.tasks.markp import model2function as mf
 
 
 # create test data
@@ -32,3 +33,8 @@ def test_model_normalization():
     assert list(result["S1"]) == [1,4]
     assert list(result["S2"]) == [2,2]
     assert list(result["S3"]) == [2,0]
+
+NORMMODELTAB = pd.DataFrame({"S1":[1,4], "S2":[2,2], "S3":[2,0]}, index=["Bacil", "Bifi"])
+M2FDF = pd.DataFrame.({})
+def test_model2function():
+    pass

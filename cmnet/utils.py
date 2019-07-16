@@ -146,6 +146,13 @@ def read_trait_table(file:Path):
     """
     return pd.read_csv(file, index_col="assembly", dtype={'sequence' : str})
 
+def read_16s_table(file:Path):
+    """ Read 16s data as series
+    """
+    normRNA = pd.read_csv(file, sep="\t", index_col=0, squeeze=True).fillna(1).clip(1)
+    normRNA.name = "rna_n"
+    return normRNA
+
 
 def biom_to_pandas_df(biom_tab):
     '''Will convert from biom Table object to pandas dataframe.'''
