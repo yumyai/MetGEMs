@@ -44,13 +44,15 @@ def make_output_dir(dirpath, strict=False):
 
 
 def read_otutable(fh):
+    """ Read OTU table file
+    """
     df = pd.read_csv(fh, sep="\t", header=0, index_col=0)
     return df
 
 
-
 def read_taxatable(fh):
-    # Currently, just parse only greengenes
+    """ Read taxa table from QIIME. Currently only work on Greengene
+    """
     alignment = ["kingdom", "phylum", "class", "order", "family", "genus", "species"]  
     predf = pd.read_csv(fh, sep="\t", header=0)
     taxondf = pd.DataFrame.from_records(predf.Taxon.apply(gg_parse)).reindex(columns=alignment)
@@ -58,8 +60,25 @@ def read_taxatable(fh):
     df = df.set_index("Feature ID")
     return df
 
-def read_reaction_files(fh):
-    # 
+
+def read_16s_table(file:Path):
+    """ Read 16s data as series
+    """
+    normRNA = pd.read_csv(file, sep="\t", index_col=0, squeeze=True).fillna(1).clip(1)
+    normRNA.name = "rna_n"
+    return normRNA
+
+
+def read_m2f(fh):
+    """ Read model2function. Keep NA since some analysis need it.
+    """
+    df = pd.read_csv(fh, sep="\t", index_col=0, header=0)
+    return df
+
+
+def read_grouper(fh):
+    """ Read file for converting 
+    """
     pass
 
 class TaxaStringError(ValueError):
@@ -124,34 +143,12 @@ def rdp_parse(s):
     return taxa_dct
 
 
-
 def get_project_dir():
     """ Returns the top-level project directory (when used with pip install -e
     """
     current_file_path = abspath(__file__)
     current_dir_path = dirname(current_file_path)
     return dirname(current_dir_path)
-
-def read_trait_table(file:Path):
-    """ Read trait table
-
-
-    Read a trait table and return pandas.
-
-    Args:
-        file:
-
-    Returns:
-
-    """
-    return pd.read_csv(file, index_col="assembly", dtype={'sequence' : str})
-
-def read_16s_table(file:Path):
-    """ Read 16s data as series
-    """
-    normRNA = pd.read_csv(file, sep="\t", index_col=0, squeeze=True).fillna(1).clip(1)
-    normRNA.name = "rna_n"
-    return normRNA
 
 
 def biom_to_pandas_df(biom_tab):

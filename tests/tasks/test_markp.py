@@ -34,7 +34,12 @@ def test_model_normalization():
     assert list(result["S2"]) == [2,2]
     assert list(result["S3"]) == [2,0]
 
+#DF1 = pd.DataFrame({"S1":[1,2], "S2":[3,4]}, index=["M1", "M2"])
+#DF2 = pd.DataFrame({"M1":[], "M2":[]}, index=["r1","r2","r3"])
+def test_align_dataframe():
+    pass
+
 NORMMODELTAB = pd.DataFrame({"S1":[1,4], "S2":[2,2], "S3":[2,0]}, index=["Bacil", "Bifi"])
-M2FDF = pd.DataFrame.({})
 def test_model2function():
+    # Since model is on the row size
     pass

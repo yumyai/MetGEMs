@@ -3,7 +3,7 @@
 
 import argparse
 import cmnet.default
-from cmnet.utils import read_otutable, read_taxatable
+from cmnet.utils import read_otutable, read_taxatable, read_16s_table, read_m2f
 import pandas as pd
 from pandas import DataFrame
 import numpy as np
@@ -36,16 +36,26 @@ def run():
         modelcon = cmnet.default.species_tables
 
     # Initialize all
-    rRNANorm = modelcon["16s"]
-    
-    modeltab = model_placement(otutab, taxtab[level])
-    modeltab.to_csv(args.output, sep="\t")
-    # Normalize 16s
-    normmodeltab = modeltab
+    rRNANorm = read_16s_table(modelcon["16s"])
+    m2ftab = read_m2f(modelcon["model_reaction"])
+    modeltab = model_placement(otutab, taxtab[level]) # otu -> model
+    #modeltab.to_csv(args.output, sep="\t")
+    normmodeltab = normalize_16s(modeltab, rRNANorm) # model -> normmodel
+    functiontab = model2function(normmodeltab, mftab)
 
+def model2function(modeltab, m2ftab):
+    """ Extrapolate model to the function (reaction)
+      Args:
+        modeltab (DataFrame): TODO
+        m2ftab (DataFrame): TODO
+    """
+    pass
 
-def model2function(modeltab, function_tab):
-    """ Extrapolate model to the function with known
+def function2group(function_tab, f2gtab):
+    """ Group reactions into other functional group (EC, KO)
+      Args:
+        function_tab (DataFrame): TODO
+        f2gtab (DataFrame): TODO
     """
     pass
 

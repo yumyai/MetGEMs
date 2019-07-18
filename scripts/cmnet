@@ -4,9 +4,10 @@ import argparse
 import sys
 
 tasks = {
-    'markp': "Place marker to the metabolic model",
+    'markp': "Calculate reaction",
     'metp': "Predict metabolic from place marker",
-    'mbuild': "Build metabolic network"
+    'mbuild': "Build metabolic network",
+    'regrp': "Regroup reaction into gene group"
 }
 
 
