@@ -77,9 +77,14 @@ def read_m2f(fh):
 
 
 def read_grouper(fh):
-    """ Read file for converting 
+    """ Read file for converting from function into KO/EC
     """
-    pass
+    df = pd.read_csv(fh, sep="\t", header=0)
+    df.columns = ["reaction", "group"]
+    # create a pivot table for transformation
+    df["value"] = 1
+    pivotdf = df.pivot(index="reaction", columns="group", values="value").fillna(0)
+    return pivotdf
 
 class TaxaStringError(ValueError):
     pass

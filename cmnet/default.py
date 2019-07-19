@@ -21,8 +21,8 @@ species_tables = {"model_reaction": path.join(genus_dir, "agora.reaction.smean.t
 # Initialize reaction mapfiles for converting AGORA reaction into other type
 map_dir = path.join(_project_dir, "default_files", "map_files")
 
-default_map = {"KO": "reaction_ko.tsv",
-               "EC": "reaction_ec.tsv"}
+default_map = {"KO": path.join(map_dir, "reaction_ko.tsv"),
+               "EC": path.join(map_dir, "reaction_ec.tsv")}
 
 #default_tables = {"16S": path.join(prokaryotic_dir, "16S.txt.gz"),
 #

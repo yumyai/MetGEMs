@@ -3,7 +3,8 @@
 
 import argparse
 import cmnet.default
-from cmnet.utils import read_otutable, read_taxatable, read_16s_table, read_m2f
+from cmnet.default import default_map
+from cmnet.utils import read_otutable, read_taxatable, read_16s_table, read_m2f, read_grouper
 import pandas as pd
 from pandas import DataFrame
 import numpy as np
@@ -37,27 +38,43 @@ def run():
 
     # Initialize all
     rRNANorm = read_16s_table(modelcon["16s"])
-    m2ftab = read_m2f(modelcon["model_reaction"])
-    modeltab = model_placement(otutab, taxtab[level]) # otu -> model
-    #modeltab.to_csv(args.output, sep="\t")
-    normmodeltab = normalize_16s(modeltab, rRNANorm) # model -> normmodel
-    functiontab = model2function(normmodeltab, mftab)
+    m2ftab = read_m2f(modelcon["model_reaction"]).fillna(0)
+    modeltab = model_placement(otutab, taxtab[level])  # otu -> model
+    normmodeltab = normalize_16s(modeltab, rRNANorm)  # model -> normmodel
+    functiontab = model2function(normmodeltab, m2ftab)
+    # Just convert to both ec and ko for now.
+    f2k = read_grouper(default_map["KO"])
+    f2e = read_grouper(default_map["EC"])
+    samplekogroup = function2group(functiontab, f2k).to_csv("out1.tsv", sep="\t")
+    sampleecgroup = function2group(functiontab, f2e).to_csv("out2.tsv", sep="\t")
+    
+
+def _relative_abundance(df):
+    """ Convert into relative abundance
+    """
+    return 100 * df / df.sum(axis=0)
 
 def model2function(modeltab, m2ftab):
     """ Extrapolate model to the function (reaction)
       Args:
-        modeltab (DataFrame): TODO
-        m2ftab (DataFrame): TODO
+        modeltab (DataFrame): model/sample dataframe.
+        m2ftab (DataFrame): model/function dataframe.
     """
-    pass
+    f2btab = m2ftab.transpose()
+    modeltab_a, f2btab_a = _align_dataframe(modeltab, f2btab)
+    return f2btab_a.dot(modeltab_a)
 
-def function2group(function_tab, f2gtab):
+
+def function2group(reaction_tab, f2gtab):
     """ Group reactions into other functional group (EC, KO)
       Args:
-        function_tab (DataFrame): TODO
-        f2gtab (DataFrame): TODO
+        reaction_tab (DataFrame): reaction/sample
+        f2gtab (DataFrame): reaction/group
     """
-    pass
+    g2ftab = f2gtab.transpose()
+    reaction_tab_a, g2ftab_a = _align_dataframe(reaction_tab, g2ftab)
+    return g2ftab_a.dot(reaction_tab_a)
+
 
 def normalize_16s(modeltab, rrnaN):
     """ normalize number of organism with 16s
@@ -71,13 +88,13 @@ def normalize_16s(modeltab, rrnaN):
 
 
 def _align_dataframe(main, converter):
-    """ Align index / column for frictionless calculation
+    """ Align index / column for dot calculation.
     The most use case is to align B/A for convert A/Sample into B/Sample.
-    While pandas help in sorting index, it error when index does not exists.
+    While pandas ok with unsorted, the dimension has to be compatible.
 
     """
     # Make sure that they are at least compatible, at least 1 intersection
-    MAINIDX = set(main.index).intersection(converter.column)
+    MAINIDX = set(main.index).intersection(converter.columns)
     assert len(MAINIDX) / len(main.index) > 0
 
     main = main.reindex(index=MAINIDX)
@@ -102,10 +119,6 @@ def model_placement(otutab, otu_mapping) -> DataFrame:
     model_tab.index.name = "model"
     return model_tab
 
-def model2function(modeltab, m2f_matrix):
-    """ Convert model count into function
-    """
-    pass
 
 def _calculate_level(otutab, taxtab, level):
     """ Currently support genus and species
