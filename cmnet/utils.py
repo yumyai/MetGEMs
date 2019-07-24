@@ -89,6 +89,23 @@ def read_grouper(fh):
 class TaxaStringError(ValueError):
     pass
 
+
+def _align_dataframe(main, converter):
+    """ Align index / column for dot calculation.
+    The most use case is to align B/A for convert A/Sample into B/Sample.
+    While pandas ok with unsorted, the dimension has to be compatible.
+
+    """
+    # Make sure that they are at least compatible, at least 1 intersection
+    MAINIDX = set(main.index).intersection(converter.columns)
+    assert len(MAINIDX) / len(main.index) > 0
+
+    main = main.reindex(index=MAINIDX)
+    converter = converter.reindex(columns=MAINIDX)
+
+    return (main, converter)
+
+
 def gg_parse(s):
     """ Parse taxonomy string in GG format. Return 7 levels of taxonomy.
        Args:

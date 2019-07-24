@@ -4,7 +4,7 @@
 import argparse
 import cmnet.default
 from cmnet.default import default_map
-from cmnet.utils import read_otutable, read_taxatable, read_16s_table, read_m2f, read_grouper
+from cmnet.utils import read_otutable, read_taxatable, read_16s_table, read_m2f, read_grouper, _align_dataframe
 import pandas as pd
 from pandas import DataFrame
 import numpy as np
@@ -42,11 +42,12 @@ def run():
     modeltab = model_placement(otutab, taxtab[level])  # otu -> model
     normmodeltab = normalize_16s(modeltab, rRNANorm)  # model -> normmodel
     functiontab = model2function(normmodeltab, m2ftab)
+    functiontab.to_csv(args.output, sep="\t")
     # Just convert to both ec and ko for now.
-    f2k = read_grouper(default_map["KO"])
-    f2e = read_grouper(default_map["EC"])
-    samplekogroup = function2group(functiontab, f2k).to_csv("out1.tsv", sep="\t")
-    sampleecgroup = function2group(functiontab, f2e).to_csv("out2.tsv", sep="\t")
+    #f2k = read_grouper(default_map["KO"])
+    #f2e = read_grouper(default_map["EC"])
+    #samplekogroup = function2group(functiontab, f2k).to_csv("out1.tsv", sep="\t")
+    #sampleecgroup = function2group(functiontab, f2e).to_csv("out2.tsv", sep="\t")
     
 
 def _relative_abundance(df):
@@ -65,17 +66,6 @@ def model2function(modeltab, m2ftab):
     return f2btab_a.dot(modeltab_a)
 
 
-def function2group(reaction_tab, f2gtab):
-    """ Group reactions into other functional group (EC, KO)
-      Args:
-        reaction_tab (DataFrame): reaction/sample
-        f2gtab (DataFrame): reaction/group
-    """
-    g2ftab = f2gtab.transpose()
-    reaction_tab_a, g2ftab_a = _align_dataframe(reaction_tab, g2ftab)
-    return g2ftab_a.dot(reaction_tab_a)
-
-
 def normalize_16s(modeltab, rrnaN):
     """ normalize number of organism with 16s
     Args:
@@ -85,22 +75,6 @@ def normalize_16s(modeltab, rrnaN):
     divarr = rrnaN.reindex(modeltab.index, fill_value=1).values
     normmodeltab = modeltab.divide(divarr, axis=0)
     return normmodeltab
-
-
-def _align_dataframe(main, converter):
-    """ Align index / column for dot calculation.
-    The most use case is to align B/A for convert A/Sample into B/Sample.
-    While pandas ok with unsorted, the dimension has to be compatible.
-
-    """
-    # Make sure that they are at least compatible, at least 1 intersection
-    MAINIDX = set(main.index).intersection(converter.columns)
-    assert len(MAINIDX) / len(main.index) > 0
-
-    main = main.reindex(index=MAINIDX)
-    converter = converter.reindex(columns=MAINIDX)
-
-    return (main, converter)
 
 
 def model_placement(otutab, otu_mapping) -> DataFrame:

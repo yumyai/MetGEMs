@@ -7,7 +7,7 @@ tasks = {
     'markp': "Calculate reaction",
     'metp': "Predict metabolic from place marker",
     'mbuild': "Build metabolic network",
-    'regrp': "Regroup reaction into gene group"
+    'regroup': "Convert list of reaction into functional group"
 }
 
 
