@@ -5,7 +5,8 @@ from cmnet.utils import get_project_dir
 
 # Default support files packaged with CMNET
 #   For genus assignment
-_project_dir = get_project_dir()
+#_project_dir = get_project_dir()
+_project_dir = path.dirname(path.abspath(__file__))
 
 #   For state prediction
 genus_dir = path.join(_project_dir, "default_files", "genus_level")

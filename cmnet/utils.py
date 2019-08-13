@@ -165,14 +165,6 @@ def rdp_parse(s):
     return taxa_dct
 
 
-def get_project_dir():
-    """ Returns the top-level project directory (when used with pip install -e
-    """
-    current_file_path = abspath(__file__)
-    current_dir_path = dirname(current_file_path)
-    return dirname(current_dir_path)
-
-
 def biom_to_pandas_df(biom_tab):
     '''Will convert from biom Table object to pandas dataframe.'''
 

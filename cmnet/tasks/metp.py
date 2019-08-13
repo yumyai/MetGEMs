@@ -1,6 +1,7 @@
 """ Document
 """
 
+import argparse
 import cmnet.default
 
 def run():

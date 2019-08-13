@@ -12,7 +12,7 @@ import numpy as np
 def run():
     parser = argparse.ArgumentParser(
             description="Calculate model's abundance from marker data",
-            usage="cmnet markp -i input.fasta -t taxa.tsv -m [genus/species] -o output.tsv")
+            usage="cmnet markp -i otu.tsv -t taxa.tsv -m [genus/species] -o output.tsv")
 
     parser.add_argument("-i", "--otutab", type=argparse.FileType("r"),
                         required=True, help='OTU table')
