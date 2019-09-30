@@ -11,8 +11,8 @@ import pandas as pd
 
 def run():
     parser = argparse.ArgumentParser(
-            description="Calculate model's abundance from marker data",
-            usage="cmnet markp -i input.fasta -t taxa.tsv -m [genus/species] -o output.tsv")
+            description="Regroup AGORA's reaction into EC/KO",
+            usage="cmnet regroup -i input.tsv -g ec/ko -o output.tsv")
 
     parser.add_argument("-i", "--input", type=argparse.FileType("r"),
                         required=True, help='Reaction table')
