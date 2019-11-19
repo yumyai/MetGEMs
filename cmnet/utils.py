@@ -10,6 +10,18 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from enum import Enum
+
+class TaxonomicLevel(Enum):
+    kingdom = 1
+    phylum = 2
+    _class = 3
+    order = 4
+    famliy = 5
+    genus = 6
+    species = 7
+
+
 def which(file):
     for path in os.environ["PATH"].split(os.pathsep):
         if os.path.exists(os.path.join(path, file)):
@@ -51,7 +63,7 @@ def read_otutable(fh):
 
 
 def read_taxatable(fh):
-    """ Read taxa table from QIIME. Currently only work on Greengene
+    """ Read taxa table from QIIME. Currently only work on Greengene's notation
     """
     alignment = ["kingdom", "phylum", "class", "order", "family", "genus", "species"]  
     predf = pd.read_csv(fh, sep="\t", header=0)
@@ -75,24 +87,14 @@ def read_m2f(fh):
     df = pd.read_csv(fh, sep="\t", index_col=0, header=0)
     return df
 
-
-def read_grouper(fh):
-    """ Read file for converting from function into KO/EC
-    """
-    df = pd.read_csv(fh, sep="\t", header=0)
-    df.columns = ["reaction", "group"]
-    # create a pivot table for transformation
-    df["value"] = 1
-    pivotdf = df.pivot(index="reaction", columns="group", values="value").fillna(0)
-    return pivotdf
-
 class TaxaStringError(ValueError):
     pass
 
 
-def _align_dataframe(main, converter):
+def align_dataframe(main, converter):
     """ Align index / column for dot calculation.
-    The most use case is to align B/A for convert A/Sample into B/Sample.
+
+    Align B/A for convert A/Sample into B/Sample.
     While pandas ok with unsorted, the dimension has to be compatible.
 
     """
@@ -108,8 +110,14 @@ def _align_dataframe(main, converter):
 
 def gg_parse(s):
     """ Parse taxonomy string in GG format. Return 7 levels of taxonomy.
-       Args:
-          s: taxonomy string in gg format (k__Kingdom; p__Phylum)
+
+    This methods it use to parsing the taxonomy string in greengene format ().
+    In a case where the sequence does not have enough resolution, that taxnomic
+    level will be shows as empty string.
+    
+        Args:
+            s: taxonomy string in gg format (k__Kingdom; p__Phylum)
+       
     """
     
     # TODO: Make it all lowercase
@@ -125,7 +133,9 @@ def gg_parse(s):
         return taxa_dct
     
     if len(items) > 7:
-        raise TaxaStringError()
+        raise TaxaStringError("Input does not seems to be in GreenGene's format: {}".format(s))
+
+    # End sanity check
         
     for token in items:
         abbrv, taxa = token.split("__")
