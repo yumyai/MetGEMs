@@ -10,7 +10,7 @@ import numpy as np
 
 import cmnet.default
 from cmnet.default import default_map, default_model
-from cmnet.utils import read_otutable, read_taxatable, read_16s_table, read_m2f, read_grouper, align_dataframe
+from cmnet.utils import read_otutable, read_taxatable, read_16s_table, read_m2f, align_dataframe
 from cmnet.model import Model, ASVData
 
 def run():
@@ -35,11 +35,13 @@ def run():
     asvdata = ASVData(otutab, taxtab)
     # Calculate number of model.
     modelargs = args.model
-    if "," in args.model:
-        for model in args.model.split(","):
-            default_model[model]
-        
-    model = Model.read_model(default_model[args.model])
+    if ".tar.gz" in modelargs:  # Probally use external model
+        models = [Model.read_model(m) for m in modelargs.split(",")]
+    else:
+        models = [Model.read_model(m) for m in modelargs.split(",")]
+
+    model = sum(models)
+    #model = Model.read_model(default_model[args.model])
     # Combine multiple model
     normmodeltab = model.map2model(asvdata)
     normmodeltab.to_csv(args.output, sep="\t")
@@ -54,10 +56,10 @@ def run():
     #functiontab = model2function(normmodeltab, m2ftab)
     #functiontab.to_csv(args.output, sep="\t")
     # Just convert to both ec and ko for now.
-    f2k = read_grouper(default_map["KO"])
-    f2e = read_grouper(default_map["EC"])
-    samplekogroup = function2group(normmodeltab, f2k).to_csv("out1.tsv", sep="\t")
-    sampleecgroup = function2group(normmodeltab, f2e).to_csv("out2.tsv", sep="\t")
+    #f2k = read_grouper(default_map["KO"])
+    #f2e = read_grouper(default_map["EC"])
+    #samplekogroup = function2group(normmodeltab, f2k).to_csv("out1.tsv", sep="\t")
+    #sampleecgroup = function2group(normmodeltab, f2e).to_csv("out2.tsv", sep="\t")
     
 
 def _relative_abundance(df):

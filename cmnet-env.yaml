@@ -11,7 +11,7 @@ dependencies:
 - jinja2=2.10
 - joblib=0.13.1
 - numpy=1.12.1
-- pandas=0.22.0
+- pandas=0.23.0
 - pytest=4.1.1
 - pytest-cov=2.6.1
 - python >=3.5,<3.7
