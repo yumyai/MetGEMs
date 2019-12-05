@@ -58,6 +58,13 @@ class Model(object):
         self.gmodel = gmodel
         self.smodel = smodel
         
+    def _validate_format(self):
+        # Check format of input
+        for i in [self.gmodel, self.smodel]:
+            if not i.index.is_unique():
+                return False
+        
+        return True
         
     def map2model(self, amplicondat: ASVData) -> DataFrame:
         """ Map amplicon data and turn it into model data
@@ -76,10 +83,8 @@ class Model(object):
         # Replace OTU with model name
         smodeltab = self._convert_dataframe(amdat_slvl, self.smodel.transpose())
         gmodeltab = self._convert_dataframe(amdat_glvl, self.gmodel.transpose())
-
         modelsampletab = gmodeltab.add(smodeltab, fill_value=0)
-        # TODO: normalize
-
+        # TODO: normalize with 16s
         return modelsampletab
 
     def _convert_dataframe(self, main: DataFrame, converter: DataFrame) -> DataFrame:
@@ -134,7 +139,16 @@ class Model(object):
         
         return cls(mhtxt, amplicon_df, genus_df, species_df)
     
-    def __add__(self, anotherModel):
-        return Model(self.anumber.add(anotherModel.anumber, fill_value=0),
-                     self.gmodel.add(anotherModel.gmodel, fill_value=0),
-                     self.smodel.add(anotherModel.smodel, fill_value=0))
+    def __add__(self, aModel):
+        # Since add takes really long time to combine if one is empty
+        def _use_one(df1, df2):
+            if df1.shape == (0,0):
+                return df2
+            if df2.shape == (0,0):
+                return df1
+            # If both zero, then it would be ok anyway.
+            return df1.add(df2, fill_value=0)
+        return Model("Merge between {} and {}".format(self.manifest, aModel.manifest),
+                     _use_one(self.anumber, aModel.anumber),
+                     _use_one(self.gmodel, aModel.gmodel),
+                     _use_one(self.smodel, aModel.smodel))

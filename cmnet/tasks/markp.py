@@ -38,28 +38,18 @@ def run():
     if ".tar.gz" in modelargs:  # Probally use external model
         models = [Model.read_model(m) for m in modelargs.split(",")]
     else:
-        models = [Model.read_model(m) for m in modelargs.split(",")]
+        models = [Model.read_model(default_model[m]) for m in modelargs.split(",")]
 
-    model = sum(models)
-    #model = Model.read_model(default_model[args.model])
-    # Combine multiple model
-    normmodeltab = model.map2model(asvdata)
-    normmodeltab.to_csv(args.output, sep="\t")
-
-    # Initialize all
-    #rRNANorm = read_16s_table(modelcon["16s"])
-    #m2ftab = read_m2f(modelcon["model_reaction"]).fillna(0)
-
-    # 
-    #modeltab = model_placement(otutab, taxtab[level])  # otu -> model
-    #normmodeltab = normalize_16s(modeltab, rRNANorm)  # model -> normmodel
-    #functiontab = model2function(normmodeltab, m2ftab)
-    #functiontab.to_csv(args.output, sep="\t")
-    # Just convert to both ec and ko for now.
-    #f2k = read_grouper(default_map["KO"])
-    #f2e = read_grouper(default_map["EC"])
-    #samplekogroup = function2group(normmodeltab, f2k).to_csv("out1.tsv", sep="\t")
-    #sampleecgroup = function2group(normmodeltab, f2e).to_csv("out2.tsv", sep="\t")
+    if len(models) == 1:
+        model = models[0]
+    else:
+        # Combining multiple model have performance problem, only do it when one is empty
+        model = models[0]
+        for i in models[1:]:
+            model += i
+    modeltab = model.map2model(asvdata)
+    modeltab.index.name = "reactions"
+    modeltab.to_csv(args.output, sep="\t")
     
 
 def _relative_abundance(df):
