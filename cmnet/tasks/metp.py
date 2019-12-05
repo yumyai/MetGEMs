@@ -6,7 +6,7 @@ import cmnet.default
 
 def run():
     parser = argparse.ArgumentParser(
-              description="Map normalize classified reads table to table",
+              description="Map normalize classified reads into functional",
               usage="cmnet metpred ")
 
     parser.add_argument("-i", type=argparse.FileType("r"), help="")

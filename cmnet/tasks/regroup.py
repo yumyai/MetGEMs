@@ -6,7 +6,7 @@ from pandas import DataFrame
 import numpy as np
 import cmnet.default
 from cmnet.default import default_map
-from cmnet.utils import read_grouper, _align_dataframe
+from cmnet.utils import align_dataframe
 import pandas as pd
 
 def run():
@@ -15,7 +15,7 @@ def run():
             usage="cmnet regroup -i input.tsv -g ec/ko -o output.tsv")
 
     parser.add_argument("-i", "--input", type=argparse.FileType("r"),
-                        required=True, help='Reaction table')
+                        required=True, help='Reaction table from markp')
     parser.add_argument("-g", "--group", type=str,
                         required=True, help='{ec, ko}')
     parser.add_argument("-o", "--output", type=argparse.FileType("w"), required=True,
@@ -35,6 +35,15 @@ def run():
     samplegroup = samplegroup.round(5)
     samplegroup.to_csv(args.output, sep="\t")
 
+def read_grouper(fh):
+    """ Read file for converting from function into KO/EC
+    """
+    df = pd.read_csv(fh, sep="\t", header=0)
+    df.columns = ["reaction", "group"]
+    # create a pivot table for transformation
+    df["value"] = 1
+    pivotdf = df.pivot(index="reaction", columns="group", values="value").fillna(0)
+    return pivotdf
 
 def function2group(reaction_tab, f2gtab) -> DataFrame:
     """ Group reactions into other functional group (EC, KO)
@@ -43,5 +52,5 @@ def function2group(reaction_tab, f2gtab) -> DataFrame:
         f2gtab (DataFrame): reaction/group
     """
     g2ftab = f2gtab.transpose()
-    reaction_tab_a, g2ftab_a = _align_dataframe(reaction_tab, g2ftab)
+    reaction_tab_a, g2ftab_a = align_dataframe(reaction_tab, g2ftab)
     return g2ftab_a.dot(reaction_tab_a)
