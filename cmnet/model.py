@@ -49,7 +49,6 @@ class ASVData(object):
         return ASVData(self.asvtab.reindex(otuid), self.taxtab.reindex(otuid))
 
 
-
 class Model(object):
     
     def __init__(self, manifest, anumber, gmodel, smodel):
@@ -78,14 +77,24 @@ class Model(object):
         # Convert OTU into model name
         amdat_slvl = amplicondat.filter_by_asvid(slvl_taxa).aggregate("species")
         amdat_glvl = amplicondat.filter_by_asvid(glvl_taxa).aggregate("genus")
+        # Normalize with 16s
+        if not self.anumber.empty:
+            sdivide = self.anumber.reindex(amdat_slvl.index, fill_value=1).iloc[:,0].values
+            gdivide = self.anumber.reindex(amdat_glvl.index, fill_value=1).iloc[:,0].values
+            amdat_slvl = amdat_slvl.divide(sdivide, axis=0)
+            amdat_glvl = amdat_glvl.divide(gdivide, axis=0)
+
         # Calculate model and combine, while this is not optimal, but it is easier to understand, inspect, and prevent mixed up
-        # since taxonomy name is a one big cluster****.
         # Replace OTU with model name
         smodeltab = self._convert_dataframe(amdat_slvl, self.smodel.transpose())
         gmodeltab = self._convert_dataframe(amdat_glvl, self.gmodel.transpose())
         modelsampletab = gmodeltab.add(smodeltab, fill_value=0)
-        # TODO: normalize with 16s
         return modelsampletab
+
+    def map2model_strat(self, amplicondat: ASVData) -> DataFrame:
+        """ Map amplicon data and turn it into model data. Use stratified to keep
+        """
+        pass
 
     def _convert_dataframe(self, main: DataFrame, converter: DataFrame) -> DataFrame:
         """ Align dataframe and multiplication, converting for one-to-one
@@ -99,11 +108,6 @@ class Model(object):
         newmain = main.reindex(mainidx)
         newconverter = converter[mainidx]
         return newconverter.dot(newmain)
-
-    def _convert_with_source(self, main: DataFrame, converter: DataFrame) -> DataFrame:
-        """ Use multiindex to keep track the source of the reaction
-        """
-        pass
 
 
     @classmethod

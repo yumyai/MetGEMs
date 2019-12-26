@@ -10,8 +10,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/scripts/cmnet",
             "console": "integratedTerminal",
-            "args": ["markp", "-i", "/home/yumyai/works/cmnet_running/feature-table.tsv",
-                "-t", "/home/yumyai/works/cmnet_running/taxonomy_gg.tsv", "-m", "gmean", "-o", "output.tsv"]
+            "args": ["markp", "-i", "/home/yumyai/works/cmnet_project/cmnet_running/data/feature-table.tsv",
+                "-t", "/home/yumyai/works/cmnet_project/cmnet_running/data/taxonomy_gg.tsv", "-m", "gmean", "-o", "output.tsv"]
         }
     ]
 }

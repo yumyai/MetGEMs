@@ -27,7 +27,7 @@ def run():
 
     # Load table
     if args.group not in ["ec", "ko"]:
-        raise ValueError()
+        raise ValueError("This function grouper is not available")
 
     f2g = read_grouper(default_map[args.group.upper()])
     samplegroup = function2group(functiontab, f2g)
@@ -36,11 +36,11 @@ def run():
     samplegroup.to_csv(args.output, sep="\t")
 
 def read_grouper(fh):
-    """ Read file for converting from function into KO/EC
+    """ Read file contains information of reaction -> functional group
     """
     df = pd.read_csv(fh, sep="\t", header=0)
     df.columns = ["reaction", "group"]
-    # create a pivot table for transformation
+    # use pivot table to ensure that  one reaction -> many functional would be transform correctly 
     df["value"] = 1
     pivotdf = df.pivot(index="reaction", columns="group", values="value").fillna(0)
     return pivotdf
@@ -54,3 +54,15 @@ def function2group(reaction_tab, f2gtab) -> DataFrame:
     g2ftab = f2gtab.transpose()
     reaction_tab_a, g2ftab_a = align_dataframe(reaction_tab, g2ftab)
     return g2ftab_a.dot(reaction_tab_a)
+
+def function2group_strat(reaction_tab, f2gtab) -> DataFrame:
+    """ Group reaction into other functional group, but with stratified (means list all bacteria involve)
+    """
+    common_idx = reaction_tab.index.intersection(f2gtab.index)
+    # Reshape both values to be compatible with each other
+    expanda = reaction_tab.values.repeat(len(f2gtab.columns), axis=0)
+    f2gtab_tf = f2gtab.reindex(common_idx).stack().to_frame()
+
+    result = pd.DataFrame(expanda * (f2gtab_tf.values), index=f2gtab_tf.index, columns=reaction_tab.columns)
+
+    return result
