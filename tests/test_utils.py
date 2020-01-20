@@ -3,7 +3,7 @@
 
 import pytest
 import pandas as pd
-from cmnet import utils
+from gemmet import utils
 
 class TestIOFormat():
 

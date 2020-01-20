@@ -1,4 +1,4 @@
-""" Marker placement to the model
+""" Run the pipeline
 """
 
 import argparse
@@ -8,10 +8,8 @@ import pandas as pd
 from pandas import DataFrame
 import numpy as np
 
-import cmnet.default
-from cmnet.default import default_map, default_model
-from cmnet.utils import read_otutable, read_taxatable, read_16s_table, read_m2f, align_dataframe
-from cmnet.model import Model, ASVData
+from cmnet.tasks.markp import *
+from cmnet.tasks.regroup import *
 
 def run():
     parser = argparse.ArgumentParser(
@@ -35,24 +33,16 @@ def run():
     asvdata = ASVData(otutab, taxtab)
     # Calculate number of model.
     modelargs = args.model
-    if ".tar.gz" in modelargs:  # Probally use external model
-        models = [Model.read_model(m) for m in modelargs.split(",")]
-    else:
-        models = [Model.read_model(default_model[m]) for m in modelargs.split(",")]
+    if "," in args.model:
+        for model in args.model.split(","):
+            default_model[model]
+        
+    model = Model.read_model(default_model[args.model])
+    # Combine multiple model
+    normmodeltab = model.map2model(asvdata)
+    normmodeltab.to_csv(args.output, sep="\t")
 
-    if len(models) == 1:
-        model = models[0]
-    else:
-        # Combining multiple model have performance problem, only do it when one is empty
-        model = models[0]
-        for i in models[1:]:
-            model += i
-    modeltab = model.map2model(asvdata)
-    modeltab.index.name = "reactions"
-    modeltab.to_csv(args.output, sep="\t")
-    
-
-def _relative_abundance(df):
-    """ Convert into relative abundance
-    """
-    return 100 * df / df.sum(axis=0)
+    f2k = read_grouper(default_map["KO"])
+    f2e = read_grouper(default_map["EC"])
+    samplekogroup = function2group(normmodeltab, f2k).to_csv("out1.tsv", sep="\t")
+    sampleecgroup = function2group(normmodeltab, f2e).to_csv("out2.tsv", sep="\t")

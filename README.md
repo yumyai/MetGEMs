@@ -1,17 +1,13 @@
-# Community Metabolic Network builder
-More info to come later.
+# GEMMET
+GEMMET is the
 
 ## Installation
-From source code
+Install with pip
 ```
-conda env create -f cmnet-env.yaml
-pip install --editable .
-```
-
-Or straight from conda
-```
-conda install -c yumyai cmnet
+git clone xyz
+cd xyz
+pip install  .
 ```
 
 ## Running
-More to come later.
+gemmet <command> -i -o 

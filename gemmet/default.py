@@ -3,7 +3,7 @@ import os
 from os import path
 import pathlib
 
-# Default support files packaged with CMNET
+# Default support files packaged with GEMMET
 #   For genus assignment
 _project_dir = path.dirname(path.abspath(__file__))
 

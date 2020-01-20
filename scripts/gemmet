@@ -1,20 +1,19 @@
 #!/usr/bin/env python
-# Main script for running
+# Main script
 import argparse
 import sys
 
 tasks = {
     'markp': "Calculate reaction",
     'metp': "Predict metabolic from place marker",
-    'mbuild': "Build metabolic network",
     'regroup': "Convert list of reaction into functional group",
     'listmodel': "List available model"
 }
 
 
 def print_help_and_exit():
-    print('CMNet - Community Metabolic Network predictor from')
-    print('\nUsage: cmnet <command> [options] <arguments>')
+    print('GEMMET - Community Metabolic Network predictor from')
+    print('\nUsage: gemmet <command> [options] <arguments>')
     print('\nAvailable command')
     for task in tasks.keys():
         print("{} - {}".format(task, tasks[task]))
@@ -31,7 +30,7 @@ def main():
         print_help_and_exit()
 
     import importlib
-    taskmodule = importlib.import_module("cmnet.tasks.{}".format(task))
+    taskmodule = importlib.import_module("gemmet.tasks.{}".format(task))
     taskmodule.run()
     return 0
 

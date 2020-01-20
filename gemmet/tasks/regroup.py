@@ -4,15 +4,15 @@
 import argparse
 from pandas import DataFrame
 import numpy as np
-import cmnet.default
-from cmnet.default import default_map
-from cmnet.utils import align_dataframe
+import gemmet.default
+from gemmet.default import default_map
+from gemmet.utils import align_dataframe
 import pandas as pd
 
 def run():
     parser = argparse.ArgumentParser(
             description="Regroup AGORA's reaction into EC/KO",
-            usage="cmnet regroup -i input.tsv -g ec/ko -o output.tsv")
+            usage="gemmet regroup -i input.tsv -g ec/ko -o output.tsv")
 
     parser.add_argument("-i", "--input", type=argparse.FileType("r"),
                         required=True, help='Reaction table from markp')

@@ -11,11 +11,10 @@ import numpy as np
 from pandas import DataFrame
 
 
-
 class ASVData(object):
     """ Object for ASV table and taxonomy table.
 
-    This object hold everything I need for metagenomics analysis (ok not EVERYTHING there is)
+    This object hold amplicon abundance and taxonomy
     """
 
     def __init__(self, asvtab:pd.DataFrame, taxtab:pd.DataFrame):
@@ -64,6 +63,30 @@ class Model(object):
                 return False
         
         return True
+
+    def mapp(self, amplicondat: ASVData) -> DataFrame:
+        """ Map amplicon data and turn it into model data
+        """
+        # Split the OTU table into species-match and genus-match, this to prevent mix-up.
+        remaintaxa = amplicondat.taxtab.copy()
+        # Match as much as species as it can, if not,  move it to upper level
+        slvl_taxa = remaintaxa[remaintaxa.species.isin(self.smodel.index)].index
+        remaintaxa = remaintaxa[~ remaintaxa.species.isin(self.smodel.index)]
+        glvl_taxa = remaintaxa[remaintaxa.genus.isin(self.gmodel.index)].index
+        # Convert OTU into model name
+        amdat_slvl = amplicondat.filter_by_asvid(slvl_taxa).aggregate("species")
+        amdat_glvl = amplicondat.filter_by_asvid(glvl_taxa).aggregate("genus")
+        # Normalize with 16s
+        if not self.anumber.empty:
+            sdivide = self.anumber.reindex(amdat_slvl.index, fill_value=1).iloc[:,0].values
+            gdivide = self.anumber.reindex(amdat_glvl.index, fill_value=1).iloc[:,0].values
+            amdat_slvl = amdat_slvl.divide(sdivide, axis=0)
+            amdat_glvl = amdat_glvl.divide(gdivide, axis=0)
+
+        pass
+
+    def convertp():
+        pass
         
     def map2model(self, amplicondat: ASVData) -> DataFrame:
         """ Map amplicon data and turn it into model data

@@ -4,8 +4,8 @@
 import argparse
 import logging
 
-import cmnet.default
-from cmnet.default import default_map, default_model
+import gemmet.default
+from gemmet.default import default_map, default_model
 
 def run():
     parser = argparse.ArgumentParser(

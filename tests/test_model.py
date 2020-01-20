@@ -1,7 +1,7 @@
 
 
-import cmnet.model as model
-from cmnet.model import ASVData, Model
+import gemmet.model as model
+from gemmet.model import ASVData, Model
 
 import os
 import pandas as pd

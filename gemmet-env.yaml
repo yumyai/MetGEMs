@@ -1,4 +1,4 @@
-name: cmnet
+name: gemmet
 channels:
 - conda-forge
 - r
