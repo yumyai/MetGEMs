@@ -2,9 +2,9 @@
 # TODO: Most functions are move to model.py
 
 import pandas as pd
-# from cmnet.tasks.markp import model_placement as mp
-# from cmnet.tasks.markp import normalize_16s as ns
-# from cmnet.tasks.markp import model2function as mf
+# from metgem.tasks.markp import model_placement as mp
+# from metgem.tasks.markp import normalize_16s as ns
+# from metgem.tasks.markp import model2function as mf
 
 
 # create test data

@@ -1,5 +1,5 @@
-
-from cmnet.tasks.regroup import function2group, function2group_strat
+import pytest
+from metgem.tasks.regroup import function2group, function2group_strat
 import pandas as pd
 
 # Simple case, everything is aligned and no missing data
@@ -21,6 +21,6 @@ def test_function2group():
 
     assert expectDF.equals(function2group(a,b))
     
-
+@pytest.mark.skip(reason="Not implement yet")
 def test_function2group_strat():
-    print(function2group_strat(a, b))
+    raise ValueError("Not test")

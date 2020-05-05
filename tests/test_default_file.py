@@ -1,7 +1,7 @@
 # Test an existence and correctness of default files and test files
 
 import os
-from cmnet.default import genus_tables, species_tables
+from metgem.default import genus_tables, species_tables
 
 
 class TestAttachFiles():

@@ -12,8 +12,8 @@ tasks = {
 
 
 def print_help_and_exit():
-    print('GEMMET - Community Metabolic Network predictor from')
-    print('\nUsage: gemmet <command> [options] <arguments>')
+    print('METGEM - Community Metabolic Network predictor from')
+    print('\nUsage: metgem <command> [options] <arguments>')
     print('\nAvailable command')
     for task in tasks.keys():
         print("{} - {}".format(task, tasks[task]))
@@ -30,7 +30,7 @@ def main():
         print_help_and_exit()
 
     import importlib
-    taskmodule = importlib.import_module("gemmet.tasks.{}".format(task))
+    taskmodule = importlib.import_module("metgem.tasks.{}".format(task))
     taskmodule.run()
     return 0
 

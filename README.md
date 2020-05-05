@@ -1,5 +1,5 @@
-# GEMMET
-GEMMET is the
+# metgem
+metgem is the
 
 ## Installation
 Install with pip
@@ -10,4 +10,4 @@ pip install  .
 ```
 
 ## Running
-gemmet <command> -i -o 
+metgem <command> -i -o 

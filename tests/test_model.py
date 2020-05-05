@@ -1,7 +1,7 @@
 
 
-import gemmet.model as model
-from gemmet.model import ASVData, Model
+import metgem.model as model
+from metgem.model import ASVData, Model
 
 import os
 import pandas as pd
