@@ -5,8 +5,6 @@ import sys
 
 tasks = {
     'markp': "Calculate reaction",
-    'metp': "Predict metabolic from place marker",
-    'regroup': "Convert list of reaction into functional group",
     'listmodel': "List available model"
 }
 
