@@ -10,5 +10,13 @@ pip install  .
 ```
 
 ## Running
-MetGEM need ASV count in tab-delimited format and taxonomic assignment in GreenGene annotation.
-metgem markp -i <exampleotu> -t <exampletaxa> -m [genus/species/hybrid] -o output.tsv
+Here we will run the example files provide with repository
+```
+# Download model
+wget https://github.com/yumyai/MetGEM/blob/master/metgem/default_files/models/kmodels/core.tar.gz?raw=true -O model.tar.gz
+# Download example files
+wget https://raw.githubusercontent.com/yumyai/MetGEM/master/examples/feature-table.tsv -O otutab.tsv
+wget https://raw.githubusercontent.com/yumyai/MetGEM/master/examples/taxonomy_gg.tsv -O taxtab.tsv
+
+metgem markp -i otutab.tsv -t taxtab.tsv -m model.tar.gz -o output.tsv
+```
