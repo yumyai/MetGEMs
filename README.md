@@ -1,12 +1,12 @@
 # MetGEMs
 ## Installation
-We recommend to install with pip in the conda environment.
+We recommend to install with pip in the conda environment. This tool has been tested with the linux environment only.
 ```
 conda create -n metgem_env python=3.7
-conda activate songbird_env
+conda activate metgem_env
 git clone https://github.com/yumyai/MetGEM
 cd MetGEM
-pip install  .
+pip install  -e .
 ```
 
 ## Running
