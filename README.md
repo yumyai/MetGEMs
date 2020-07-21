@@ -1,6 +1,6 @@
 # MetGEMs
 ## Installation
-We recommend to install with pip in the conda environment. This tool has been tested with the linux environment only.
+We recommend to install with pip in the conda environment. This tool has been tested with the linux environment only. It has numpy and pandas as dependency.
 ```
 conda create -n metgem_env python=3.7
 conda activate metgem_env
