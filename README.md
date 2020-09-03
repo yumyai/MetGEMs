@@ -1,4 +1,9 @@
 # MetGEMs
+
+## Introduction
+
+
+
 ## Installation
 We recommend to install with pip in the conda environment. This tool has been tested with the linux environment only. It has numpy and pandas as dependency.
 ```
@@ -9,7 +14,7 @@ cd MetGEM
 pip install  -e .
 ```
 
-## Running
+## How to run (with example)
 Here we will run the example files provide with repository
 ```
 # Download model
