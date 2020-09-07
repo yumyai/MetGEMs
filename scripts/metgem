@@ -4,13 +4,13 @@ import argparse
 import sys
 
 tasks = {
-    'markp': "Calculate reaction",
-    'listmodel': "List available model"
+    'markp': "Calculate function abundance from microbial communities",
+    'listmodel': "List all available models"
 }
 
 
 def print_help_and_exit():
-    print('METGEM - Community Metabolic Network predictor from')
+    print('METGEM - A python toolbox for metabolic model-based fucntional prediction from microbial communities')
     print('\nUsage: metgem <command> [options] <arguments>')
     print('\nAvailable command')
     for task in tasks.keys():
