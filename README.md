@@ -11,7 +11,7 @@
 - [Limitations](#limit)
 
 ## <a name="intro"></a>Introduction
-MetGEM is a tool for predicting functional composition of microbial communities using metabolic models.
+MetGEM is a software package for predicting functional composition of microbial communities using metabolic models.
 
 
 ## <a name="start"></a>Getting Started
@@ -42,11 +42,13 @@ listmodel - List available model
 
 ### <a name="genuse"></a>General usage
 MetGEM takes two tab-delimited tables as an input
-1. ASV/OTU table that list the abundance of ASV/OTU of each sample. [example](https://github.com/yumyai/MetGEMs/blob/master/examples/feature-table.tsv)
-2. Taxonomy table. [example](https://github.com/yumyai/MetGEMs/blob/master/examples/taxonomy_gg.tsv)
+1. ASV/OTU table that list the abundance of ASV/OTU of each sample. [example](https://github.com/yumyai/MetGEMs/blob/master/tests/test_data/otutab.tsv)
+2. Taxonomy table. [example](https://github.com/yumyai/MetGEMs/blob/master/tests/test_data/taxtab.tsv)
 3. (Optional) Models files
 
-MetGEM came with prebuilt functional models using [AGORA's model](https://github.com/VirtualMetabolicHuman/AGORA). Although using external model is possible, there is no official support yet.
+MetGEM came with prebuilt functional models based on [AGORA's model](https://github.com/VirtualMetabolicHuman/AGORA).
+
+#### Quick usage
 
 
 #### Use cases
@@ -78,7 +80,6 @@ If you encounter bugs or having futher questions, you can create an issue at the
 ### <a name="cite"></a>Citing MetGEM
 Soon.
 
-
-## Limitation
+### <a name="limit"></a>Limitations
 - There is no way to independently assign a taxonomic weight outside include directly into a model.
 - KO <-> EC conversion is not supported.
