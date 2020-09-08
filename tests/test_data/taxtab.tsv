@@ -1,6 +1,6 @@
-#Feature	Taxon	Confidence	
+Feature ID	Taxon	Confidence
 c28d0a4d9f1c7b39400278482dcb0d59	k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Prevotellaceae; g__Prevotella; s__copri	0.9999995618688153
-bccda5b8e71776dfdfbd836b63e0ef33    k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Bacteroidaceae; g__Bacteroides; s__ 0.9999947747424565
-1f393c744249d3a953ac6cae27c28bad    k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__Ruminococcaceae; g__Faecalibacterium; s__prausnitzii    0.9995279291949765
-cb3f62fe44c353b308dc53d49677c7a0    k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Bacteroidaceae; g__Bacteroides; s__uniformis    0.9992936189379406
-519be1830883f4f5cad98676faa7b164    k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Rikenellaceae; g__Alistipes; s__putredinis  0.8414898898645604
+bccda5b8e71776dfdfbd836b63e0ef33	k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Bacteroidaceae; g__Bacteroides; s__	0.9999947747424565
+1f393c744249d3a953ac6cae27c28bad	k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__Ruminococcaceae; g__Faecalibacterium; s__prausnitzii	0.9995279291949765
+cb3f62fe44c353b308dc53d49677c7a0	k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Bacteroidaceae; g__Bacteroides; s__uniformis	0.9992936189379406
+519be1830883f4f5cad98676faa7b164	k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Rikenellaceae; g__Alistipes; s__putredinis	0.8414898898645604

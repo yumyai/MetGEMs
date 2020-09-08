@@ -95,10 +95,10 @@ def read_taxatable(fh):
     """ Read taxa table from QIIME. Currently only work on Greengene's notation
     """
     alignment = ["kingdom", "phylum", "class", "order", "family", "genus", "species"]  
-    predf = pd.read_csv(fh, sep="\t", header=0)
+    predf = pd.read_csv(fh, sep="\t", index_col=0, header=0)
     taxondf = pd.DataFrame.from_records(predf.Taxon.apply(gg_parse)).reindex(columns=alignment)
-    df = pd.concat([predf["Feature ID"], taxondf, predf["Confidence"]], axis=1)
-    df = df.set_index("Feature ID")
+    taxondf.index = predf.index
+    df = pd.concat([taxondf, predf["Confidence"]], axis=1)
     return df
 
 
@@ -115,6 +115,7 @@ def read_m2f(fh):
     """
     df = pd.read_csv(fh, sep="\t", index_col=0, header=0)
     return df
+
 
 class TaxaStringError(ValueError):
     pass
