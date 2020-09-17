@@ -25,8 +25,6 @@ git clone https://github.com/yumyai/MetGEM
 cd MetGEM
 pip install  -e .
 ```
-When finished, you should 
-
 When all is done, running `metgem` should print out the list of available commands.
 
 ```
@@ -47,39 +45,42 @@ MetGEM takes two tab-delimited tables as an input
 3. (Optional) Models files
 
 MetGEM came with prebuilt functional models based on [AGORA's model](https://github.com/VirtualMetabolicHuman/AGORA).
+The update that allow the MetGEMs to use custom model is on the way.
 
 #### Quick usage
-
-
-#### Use cases
-#### 1) Prepare input data
-In this example, we will use the example files provide with repository.
+#### 1) Download input data
+We will use the example files for a quick demonstration how MetGEMs works.
 ```
 wget https://raw.githubusercontent.com/yumyai/MetGEM/master/examples/feature-table.tsv -O otutab.tsv
 wget https://raw.githubusercontent.com/yumyai/MetGEM/master/examples/taxonomy_gg.tsv -O taxtab.tsv
 ```
-Addtionally, we download the model separately. In the real use, you could use the `listmodel` command to see the included models, but for the sake of simpliscity, we will download models instead
-
-```
-wget https://github.com/yumyai/MetGEM/blob/master/metgem/default_files/models/kmodels/core.tar.gz?raw=true -O ko_model.tar.gz
-wget https://github.com/yumyai/MetGEM/blob/master/metgem/default_files/models/emodels/core.tar.gz?raw=true -O ec_model.tar.gz
-```
-
 #### 2) Convert ASVs table into KO profiles and EC profiles
-
-The commands to produce KO profiles and EC profiles are identicle except for the model part. This is our deliberate design choice, since we found that converting between KO/EC is not straightforward precedure.
+MetGEMs come bundle with all kind of models. `listmodel` command can be used to list all models include with the MetGEMs.
+The commands to produce KO profile abundance and EC profile abundance are identicle except for the model part.
 ```
-metgem markp -i otutab.tsv -t taxtab.tsv -m ko_model.tar.gz -o output_ko.tsv
-metgem markp -i otutab.tsv -t taxtab.tsv -m ec_model.tar.gz -o output_ec.tsv
+metgem markp -i otutab.tsv -t taxtab.tsv -m k_core -o output_ko.tsv
+metgem markp -i otutab.tsv -t taxtab.tsv -m e_core -o output_ec.tsv
 ```
 
-The result should be EC/KO tables.
+The result should be in `output_ko.tsv` and `output_ec.tsv` as KO abundance table and EC numbers abundance table respectively. There are others type of option available (pan, pan-weight), but we found that core and core-weight usually provide a good estimation in most situations.
+
+
+#### Use cases
+##### Convert taxonomy abundance table into KO IDs abundance table.
+```
+metgem markp -i otutab.tsv -t taxtab.tsv -m k_core -o output_ko.tsv
+```
+
+##### Convert taxonomy abundance table into EC numbers abundance table.
+```
+metgem markp -i otutab.tsv -t taxtab.tsv -m e_core -o output_ec.tsv
+```
 
 ### <a name="gethelp"></a>Getting help
 If you encounter bugs or having futher questions, you can create an issue at the [Issues page](https://github.com/yumyai/MetGEMs/issues). I will get in touch as soon as possible.
 ### <a name="cite"></a>Citing MetGEM
-Soon.
+TODO.
 
 ### <a name="limit"></a>Limitations
 - There is no way to independently assign a taxonomic weight outside include directly into a model.
-- KO <-> EC conversion is not supported.
+- KO <-> EC conversion is not supported. While it is trivial, we notice that most EC <-> KO conversion are not 1-1 mapping so we would not recommend.
