@@ -29,7 +29,7 @@ model_dirs = path.join(_project_dir, "default_files",  "models")
 # Look into the default model
 default_model = {}
 for model in pathlib.Path(model_dirs).glob("**/*.tar.gz"):
-        abspath = model.absolute()
-        # Get basename, since it is .tar.gz so we need to split two times
-        basename = os.path.splitext(abspath.stem)[0]
-        default_model[basename] = abspath
+    abspath = model.absolute()
+    # Get basename, since it is .tar.gz so we need to split two times
+    basename = os.path.splitext(abspath.stem)[0]
+    default_model[basename] = abspath
