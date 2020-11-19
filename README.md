@@ -42,10 +42,8 @@ listmodel - List available model
 MetGEM takes two tab-delimited tables as an input
 1. ASV/OTU table that list the abundance of ASV/OTU of each sample. [example](https://github.com/yumyai/MetGEMs/blob/master/tests/test_data/otutab.tsv)
 2. Taxonomy table. [example](https://github.com/yumyai/MetGEMs/blob/master/tests/test_data/taxtab.tsv)
-3. (Optional) Models files
 
 MetGEM came with prebuilt functional models based on [AGORA's model](https://github.com/VirtualMetabolicHuman/AGORA).
-The update that allow the MetGEMs to use custom model is on the way.
 
 #### Quick usage
 #### 1) Download input data
