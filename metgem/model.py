@@ -64,7 +64,6 @@ class ASVData(object):
 
     def filter_by_asvid(self, otuid):
         """Filter by OTU list"""
-
         return ASVData(self.asvtab.reindex(otuid), self.taxtab.reindex(otuid))
 
 
@@ -98,8 +97,8 @@ class Model(object):
 
         sluse = slvl_taxa.size
         gnuse = glvl_taxa.size
-        log.info("Genus match to model {} - {}".format(gnuse))
-        log.info("Species match to model {} - {}".format(sluse))
+        log.info("Genus match to model {}".format(gnuse))
+        log.info("Species match to model {}".format(sluse))
 
         # Convert OTU into model name
         amdat_slvl = amplicondat.filter_by_asvid(slvl_taxa).aggregate("species")
