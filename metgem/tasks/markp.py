@@ -10,22 +10,42 @@ import numpy as np
 
 import metgem.default
 from metgem.default import default_map, default_model
-from metgem.utils import read_otutable, read_taxatable, read_16s_table, read_m2f, align_dataframe
+from metgem.utils import (
+    read_otutable,
+    read_taxatable,
+    read_16s_table,
+    read_m2f,
+    align_dataframe,
+)
 from metgem.model import Model, ASVData
+
 
 def run():
     parser = argparse.ArgumentParser(
-            description="Calculate model's abundance from marker data",
-            usage="metgem markp -i otu.tsv -t taxa.tsv -m [genus/species/hybrid] -o output.tsv")
+        description="Calculate model's abundance from marker data",
+        usage="metgem markp -i otu.tsv -t taxa.tsv -m [genus/species/hybrid] -o output.tsv",
+    )
 
-    parser.add_argument("-i", "--otutab", type=argparse.FileType("r"),
-                        required=True, help='OTU table')
-    parser.add_argument("-t", "--taxtsv", type=argparse.FileType("r"), required=True,
-                        help='Linage files')
-    parser.add_argument("-m", "--model", type=str, required=True, default="gmean",
-                        help='Model to use')
-    parser.add_argument("-o", "--output", type=argparse.FileType("w"), required=True,
-                        help='Output table')
+    parser.add_argument(
+        "-i", "--otutab", type=argparse.FileType("r"), required=True, help="OTU table"
+    )
+    parser.add_argument(
+        "-t",
+        "--taxtsv",
+        type=argparse.FileType("r"),
+        required=True,
+        help="Linage files",
+    )
+    parser.add_argument(
+        "-m", "--model", type=str, required=True, default="gmean", help="Model to use"
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=argparse.FileType("w"),
+        required=True,
+        help="Output table",
+    )
     args = parser.parse_args()
 
     # Load table
@@ -50,9 +70,8 @@ def run():
     modeltab = model.map2model(asvdata)
     modeltab.index.name = "reactions"
     modeltab.to_csv(args.output, sep="\t")
-    
+
 
 def _relative_abundance(df):
-    """ Convert into relative abundance
-    """
+    """Convert into relative abundance"""
     return 100 * df / df.sum(axis=0)

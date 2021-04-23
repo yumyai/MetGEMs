@@ -11,19 +11,33 @@ import numpy as np
 from metgem.tasks.markp import *
 from metgem.tasks.regroup import *
 
+
 def run():
     parser = argparse.ArgumentParser(
-            description="Calculate model's abundance from marker data",
-            usage="metgem markp -i otu.tsv -t taxa.tsv -m [genus/species/hybrid] -o output.tsv")
+        description="Calculate model's abundance from marker data",
+        usage="metgem markp -i otu.tsv -t taxa.tsv -m [genus/species/hybrid] -o output.tsv",
+    )
 
-    parser.add_argument("-i", "--otutab", type=argparse.FileType("r"),
-                        required=True, help='OTU table')
-    parser.add_argument("-t", "--taxtsv", type=argparse.FileType("r"), required=True,
-                        help='Linage files')
-    parser.add_argument("-m", "--model", type=str, required=True, default="gmean",
-                        help='Model to use')
-    parser.add_argument("-o", "--output", type=argparse.FileType("w"), required=True,
-                        help='Output table')
+    parser.add_argument(
+        "-i", "--otutab", type=argparse.FileType("r"), required=True, help="OTU table"
+    )
+    parser.add_argument(
+        "-t",
+        "--taxtsv",
+        type=argparse.FileType("r"),
+        required=True,
+        help="Linage files",
+    )
+    parser.add_argument(
+        "-m", "--model", type=str, required=True, default="gmean", help="Model to use"
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=argparse.FileType("w"),
+        required=True,
+        help="Output table",
+    )
     args = parser.parse_args()
 
     # Load table
@@ -36,7 +50,7 @@ def run():
     if "," in args.model:
         for model in args.model.split(","):
             default_model[model]
-        
+
     model = Model.read_model(default_model[args.model])
     # Combine multiple model
     normmodeltab = model.map2model(asvdata)

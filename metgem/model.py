@@ -14,51 +14,47 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 sth = logging.StreamHandler()
 sth.setLevel(logging.INFO)
-stdoutformat = logging.Formatter(
-    '%(asctime)s: %(message)s', datefmt='[%I:%M %p]')
+stdoutformat = logging.Formatter("%(asctime)s: %(message)s", datefmt="[%I:%M %p]")
 sth.setFormatter(stdoutformat)
 log.addHandler(sth)
 
 
 class ASVData(object):
-    """ Object for ASV table and taxonomy table.
+    """Object for ASV table and taxonomy table.
 
     This object hold amplicon abundance and taxonomy
 
     asvtab: ASV abundance
-    taxtab: 
+    taxtab:
     """
 
-    def __init__(self, asvtab:pd.DataFrame, taxtab:pd.DataFrame):
+    def __init__(self, asvtab: pd.DataFrame, taxtab: pd.DataFrame):
         self.asvtab = asvtab
         self.taxtab = taxtab
         self._self_check()
 
     def _self_check(self):
-        """ Check format of asv and taxonomy table
+        """Check format of asv and taxonomy table
         1. asvtab SHOULDN'T have taxonomyname
         2. index in both should be the same
         """
-        # Check 
+        # Check
         np.intersect1d(self.asvtab.index, self.taxtab.index)
         return True
 
     def gg_output(self):
-        """ Normally, taxonomy and ASV are in separate table (Due to how taxonomy is stored).
-            This would combine taxonomy into one string (gg-format) and use as index
+        """Normally, taxonomy and ASV are in separate table (Due to how taxonomy is stored).
+        This would combine taxonomy into one string (gg-format) and use as index
         """
-        # First, align ASV 
-        
+        # First, align ASV
+
         self.taxtab.align()
 
     def aggregate(self, level) -> DataFrame:
-        """ Aggregate OTU/ASV with the same taxonomy 
-        """
+        """Aggregate OTU/ASV with the same taxonomy"""
         group = self.taxtab[level]
         group.name = level
-        modeltab = (self.asvtab.join(group, how="left")
-          .groupby(level)
-          .aggregate(sum))
+        modeltab = self.asvtab.join(group, how="left").groupby(level).aggregate(sum)
         modeltab.index.name = "model"
         return modeltab
 
@@ -68,30 +64,27 @@ class ASVData(object):
 
 
 class Model(object):
-    
     def __init__(self, manifest, anumber, gmodel, smodel):
         self.manifest = manifest
         self.anumber = anumber
         self.gmodel = gmodel
         self.smodel = smodel
-        
+
     def _validate_format(self):
         # Check format of input
         for i in [self.gmodel, self.smodel]:
             if not i.index.is_unique():
                 return False
-        
+
         return True
 
-
     def map2model(self, amplicondat: ASVData) -> DataFrame:
-        """ Map amplicon data and turn it into model data
-        """
+        """Map amplicon data and turn it into model data"""
         # Split the OTU table into species-match and genus-match, this to prevent mix-up.
         remaintaxa = amplicondat.taxtab.copy()
         # Match as much as species as it can, if not,  move it to upper level
         slvl_taxa = remaintaxa[remaintaxa.species.isin(self.smodel.index)].index
-        remaintaxa = remaintaxa[~ remaintaxa.species.isin(self.smodel.index)]
+        remaintaxa = remaintaxa[~remaintaxa.species.isin(self.smodel.index)]
         glvl_taxa = remaintaxa[remaintaxa.genus.isin(self.gmodel.index)].index
         # Log number of match in each level.
 
@@ -104,12 +97,16 @@ class Model(object):
         amdat_slvl = amplicondat.filter_by_asvid(slvl_taxa).aggregate("species")
         amdat_glvl = amplicondat.filter_by_asvid(glvl_taxa).aggregate("genus")
 
-        #log.info("Total of match species / genus /= {} - {}".format(amdat_slvl.size, amdat_glvl.size))
+        # log.info("Total of match species / genus /= {} - {}".format(amdat_slvl.size, amdat_glvl.size))
 
         # Normalize with 16s
         if not self.anumber.empty:
-            sdivide = self.anumber.reindex(amdat_slvl.index, fill_value=1).iloc[:,0].values
-            gdivide = self.anumber.reindex(amdat_glvl.index, fill_value=1).iloc[:,0].values
+            sdivide = (
+                self.anumber.reindex(amdat_slvl.index, fill_value=1).iloc[:, 0].values
+            )
+            gdivide = (
+                self.anumber.reindex(amdat_glvl.index, fill_value=1).iloc[:, 0].values
+            )
             amdat_slvl = amdat_slvl.divide(sdivide, axis=0)
             amdat_glvl = amdat_glvl.divide(gdivide, axis=0)
 
@@ -121,13 +118,12 @@ class Model(object):
         return modelsampletab
 
     def map2model_strat(self, amplicondat: ASVData) -> DataFrame:
-        """ Map amplicon data and turn it into model data. Use stratified to keep
-        """
+        """Map amplicon data and turn it into model data. Use stratified to keep"""
         pass
 
     def _convert_dataframe(self, main: DataFrame, converter: DataFrame) -> DataFrame:
-        """ Align dataframe and multiplication, converting for one-to-one
-        
+        """Align dataframe and multiplication, converting for one-to-one
+
         Align dataframe multiply them
 
           Args:
@@ -138,10 +134,9 @@ class Model(object):
         newconverter = converter[mainidx]
         return newconverter.dot(newmain)
 
-
     @classmethod
     def read_model(cls, fh):
-        """ Read model file and deserialize to 
+        """Read model file and deserialize to
 
         The model file is store in .tar.gz format. If the level of model does not exists, then it return empty data.frame (or None)
         """
@@ -158,7 +153,7 @@ class Model(object):
                 pass
 
             return retdf
-                
+
         gzh = tarfile.open(fh, mode="r:gz")
         # Check model's files
         fnames = [f.name for f in gzh.getmembers()]
@@ -169,24 +164,26 @@ class Model(object):
         amplicon_df = _try_read_files("anumber.tsv", gzh)
         genus_df = _try_read_files("gmodel.tsv", gzh)
         species_df = _try_read_files("smodel.tsv", gzh)
-        
+
         return cls(mhtxt, amplicon_df, genus_df, species_df)
-    
+
     def get_model_level(self, levels):
         """Get level of model that match"""
         self.gemmodel()
 
-
     def __add__(self, aModel):
         # Since add takes really long time to combine if one is empty
         def _use_one(df1, df2):
-            if df1.shape == (0,0):
+            if df1.shape == (0, 0):
                 return df2
-            if df2.shape == (0,0):
+            if df2.shape == (0, 0):
                 return df1
             # If both zero, then it would be ok anyway.
             return df1.add(df2, fill_value=0)
-        return Model("Merge between {} and {}".format(self.manifest, aModel.manifest),
-                     _use_one(self.anumber, aModel.anumber),
-                     _use_one(self.gmodel, aModel.gmodel),
-                     _use_one(self.smodel, aModel.smodel))
+
+        return Model(
+            "Merge between {} and {}".format(self.manifest, aModel.manifest),
+            _use_one(self.anumber, aModel.anumber),
+            _use_one(self.gmodel, aModel.gmodel),
+            _use_one(self.smodel, aModel.smodel),
+        )
