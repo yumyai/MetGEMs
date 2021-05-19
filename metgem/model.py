@@ -161,7 +161,7 @@ class Model(object):
         mh = gzh.extractfile("manifest")
         mhtxt = mh.read()
         # Read model
-        amplicon_df = _try_read_files("anumber.tsv", gzh)
+        amplicon_df = _try_read_files("anumber.txt", gzh)
         genus_df = _try_read_files("gmodel.tsv", gzh)
         species_df = _try_read_files("smodel.tsv", gzh)
 
