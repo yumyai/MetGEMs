@@ -4,8 +4,7 @@
 import argparse
 import logging
 
-import metgem.default
-from metgem.default import default_map, default_model
+from metgem.default import default_model
 
 
 def run():

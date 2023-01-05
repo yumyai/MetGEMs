@@ -4,10 +4,10 @@ from os import path
 import pathlib
 
 # Default support files packaged with metgem
-#   For genus assignment
+# For genus assignment
 _project_dir = path.dirname(path.abspath(__file__))
 
-# # Initialize reaction mapfiles for converting AGORA reaction into other type
+# Initialize reaction mapfiles for converting AGORA reaction into other type
 map_dir = path.join(_project_dir, "default_files", "map_files")
 
 default_map = {
